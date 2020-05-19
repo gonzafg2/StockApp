@@ -100,6 +100,7 @@
 
 <script>
 import { db } from "../boot/firebase";
+import { QSpinnerFacebook } from 'quasar'
 
 export default {
   data () {
@@ -146,7 +147,19 @@ export default {
   methods: {
     async listarInOut(){
       try {
-        this.$q.loading.show();
+        const spinner = typeof QSpinnerFacebook !== 'undefined'
+        ? QSpinnerFacebook // Non-UMD, imported above
+        : Quasar.components.QSpinnerFacebook // eslint-disable-line
+      /* End of Codepen workaround */
+
+        this.$q.loading.show({
+          spinner,
+          spinnerColor: 'indigo',
+          spinnerSize: 140,
+          backgroundColor: 'indigo',
+          message: 'Por favor espere. Se están cargando sus datos...',
+          messageColor: 'white'
+        });
 
         const query = await db.collection('productos').get();
         
