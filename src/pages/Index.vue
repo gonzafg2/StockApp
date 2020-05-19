@@ -1,8 +1,8 @@
 <template>
   <div class="q-pa-md">
-    <h4 class="flex flex-center">Entradas y Salidas</h4>
+    <h4 class="flex flex-center">Stock de Productos</h4>
     <q-table
-      title="Registro"
+      title="Inventario"
       :data="data"
       :columns="columns"
       row-key="id"
@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { db } from "../boot/firebase";
+
 export default {
   data () {
     return {
@@ -107,7 +109,36 @@ export default {
       filter: undefined
     })
   },
+
+  created(){
+    this.listarInOut();
+  },
+
   methods: {
+
+    async listarInOut(){
+      try {
+        const query = await db.collection('productos').get();
+        
+        query.forEach(elemento => {
+
+          let producto = {
+            id: elemento.id,
+            item: elemento.data().item,
+            cantidad: elemento.data().stock,
+            codigo: elemento.data().codigo,
+            unidad: elemento.data().unidad
+          }
+          console.log(producto);
+
+        });
+        
+        
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     onRequest (props) {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
       const filter = props.filter
