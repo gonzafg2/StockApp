@@ -12,6 +12,7 @@
       :columns="columns"
       :loading="loading"
       :filter="filter"
+      :pagination.sync="pagination"
       row-key="item"
     >
        <template v-slot:top>
@@ -21,9 +22,6 @@
             <q-icon name="search" />
           </template>
         </q-input>
-      </template>
-      <template v-slot:loading>
-        <q-inner-loading showing color="primary" />
       </template>
     </q-table>
 
@@ -92,7 +90,7 @@
 
       <div class="flex flex-center q-pa-md q-gutter-lg">
       <q-btn unelevated rounded color="primary" label="Guardar" size="md" @click="guardarItem" />
-      <q-btn unelevated rounded color="warning" label="Limpiar" size="md" />
+      <q-btn unelevated rounded color="warning" label="Limpiar" size="md" @click="limpiarItem" />
     </div>
 
     </div>
@@ -115,6 +113,9 @@ export default {
       unidad: '',
       loading: false,
       filter: '',
+      pagination: {
+        rowsPerPage: 10
+      },
       columns: [
         {
           name: 'item',
@@ -162,8 +163,6 @@ export default {
             minimo: elemento.data().minimo
           }
           this.data.push(producto);
-          console.log(producto);
-
         });
         
       } catch (error) {
@@ -173,26 +172,7 @@ export default {
   }
     },
 
-    async guardarItem(){
-      let query = await db.collection('productos').add({
-        item: this.item,
-        codigo: this.codigo,
-        stock: this.stock,
-        lugar: this.lugar,
-        tipo: this.tipo,
-        unidad: this.unidad,
-        minimo: this.minimo,
-      });
-      this.data.push({
-        id: query.id,
-        item: this.item,
-        codigo: this.codigo,
-        stock: this.stock,
-        lugar: this.lugar,
-        tipo: this.tipo,
-        unidad: this.unidad,
-        minimo: this.minimo,
-      });
+    limpiarItem(){
       this.item = '';
       this.codigo = '';
       this.stock = '';
@@ -200,6 +180,64 @@ export default {
       this.tipo = '';
       this.unidad = '';
       this.minimo = '';
+    },
+
+    guardarItem(){
+      
+      this.$q.dialog({
+        title: 'Acción Importante: Requiere Confirmación.',
+        message: '¿Está seguro de guardar este producto dentro de su inventario?',
+        ok: {
+          push: true,
+          label: "Sí, guardar."
+        },
+        cancel: {
+          push: true,
+          color: 'negative',
+          label: "¡No!"
+        },
+        persistent: true
+      }).onOk(async () => {
+        
+          let query = await db.collection('productos').add({
+            item: this.item,
+            codigo: this.codigo,
+            stock: this.stock,
+            lugar: this.lugar,
+            tipo: this.tipo,
+            unidad: this.unidad,
+            minimo: this.minimo,
+          });
+        // console.log('>>>> OK')
+          this.data.push({
+            id: query.id,
+            item: this.item,
+            codigo: this.codigo,
+            stock: this.stock,
+            lugar: this.lugar,
+            tipo: this.tipo,
+            unidad: this.unidad,
+            minimo: this.minimo,
+          });
+          this.item = '';
+          this.codigo = '';
+          this.stock = '';
+          this.lugar = '';
+          this.tipo = '';
+          this.unidad = '';
+          this.minimo = '';
+    
+          this.$q.notify({
+            message: 'El producto se ha guardado exitosamente',
+            color: 'primary',
+            textColor: 'white',
+            icon: 'cloud_done'
+          })
+      }).onCancel(() => {
+        // console.log('>>>> Cancel')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
     },
 
   }
