@@ -11,13 +11,93 @@
       :data="data"
       :columns="columns"
       :loading="loading"
+      :filter="filter"
       row-key="item"
     >
-      <template v-slot:loading v-show="data != []">
+       <template v-slot:top>
+        <q-space />
+        <q-input borderless dense debounce="300" color="primary" v-model="filter" placeholder="Buscar...">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
+      <template v-slot:loading>
         <q-inner-loading showing color="primary" />
       </template>
     </q-table>
+
+    <div class="q-pa-md">
+    <h5 class="flex flex-center">Ingreso de Productos</h5>
+    <div class="q-gutter-y-md row" style="max-width: 100%">
+      <q-input label="Código" class="col-2" rounded outlined v-model="codigo">
+        <template v-slot:append>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
+        </template>
+      </q-input>
+      <div class="flex-break q-px-md"></div>
+      <q-input label="Item" class="col" rounded outlined v-model="item">
+        <template v-slot:append>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
+        </template>
+      </q-input>
+      <div class="flex-break q-px-md"></div>
+      <q-input label="Stock" class="col" rounded outlined v-model="stock">
+        <template v-slot:append>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
+        </template>
+      </q-input>
+      <div class="flex-break q-px-md"></div>
+      <q-input label="Unidad" class="col" rounded outlined v-model="unidad">
+        <template v-slot:append>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
+        </template>
+      </q-input>
+      </div>
+      
+      <div class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
+        <q-input label="Tipo" class="col" rounded outlined v-model="tipo">
+        <template v-slot:append>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
+        </template>
+        </q-input>
+        <div class="flex-break q-px-md"></div>
+        <q-input label="Lugar" class="col" rounded outlined v-model="lugar">
+          <template v-slot:append>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+            </q-avatar>
+          </template>
+        </q-input>
+        <div class="flex-break q-px-md"></div>
+        <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo">
+          <template v-slot:append>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+            </q-avatar>
+          </template>
+        </q-input>
+
+      </div>
+
+      <div class="flex flex-center q-pa-md q-gutter-lg">
+      <q-btn unelevated rounded color="primary" label="Guardar" size="md" @click="guardarItem" />
+      <q-btn unelevated rounded color="warning" label="Limpiar" size="md" />
+    </div>
+
+    </div>
   </div>
+
 </template>
 
 <script>
@@ -26,7 +106,15 @@ import { db } from "../boot/firebase";
 export default {
   data () {
     return {
+      item: '',
+      codigo: '',
+      lugar: '',
+      tipo: '',
+      minimo: '',
+      stock: '',
+      unidad: '',
       loading: false,
+      filter: '',
       columns: [
         {
           name: 'item',
@@ -42,21 +130,12 @@ export default {
         { name: 'unidad', label: 'Unidad', field: 'unidad', sortable: true },
         { name: 'tipo', align: 'center', label: 'Tipo', field: 'tipo', sortable: true },
         { name: 'lugar',align: 'center', label: 'Lugar', field: 'lugar', sortable: true },
-        { name: 'minimo', label: 'Stock Mínimo', field: 'minimo' }
+        { name: 'minimo', label: 'Stock Mínimo', field: 'minimo' },
+        { name: 'eliminar', align: 'center', label: 'Acciones'}
+        // {<q-btn flat color="red" @click="eliminar(index)">Eliminar</q-btn>}
       ],
 
-      data: [
-        // {
-        //   name: 'Frozen Yogurt',
-        //   calories: 159,
-        //   fat: 6.0,
-        //   carbs: 24,
-        //   protein: 4.0,
-        //   sodium: 87,
-        //   calcium: '14%',
-        //   iron: '1%'
-        // },
-      ]
+      data: []
     }
   },
   created(){
@@ -66,6 +145,8 @@ export default {
   methods: {
     async listarInOut(){
       try {
+        this.$q.loading.show();
+
         const query = await db.collection('productos').get();
         
         query.forEach(elemento => {
@@ -86,9 +167,41 @@ export default {
         });
         
       } catch (error) {
-        console.log(error);
-      }
+          console.log(error);
+      } finally {
+          this.$q.loading.hide();
+  }
     },
+
+    async guardarItem(){
+      let query = await db.collection('productos').add({
+        item: this.item,
+        codigo: this.codigo,
+        stock: this.stock,
+        lugar: this.lugar,
+        tipo: this.tipo,
+        unidad: this.unidad,
+        minimo: this.minimo,
+      });
+      this.data.push({
+        id: query.id,
+        item: this.item,
+        codigo: this.codigo,
+        stock: this.stock,
+        lugar: this.lugar,
+        tipo: this.tipo,
+        unidad: this.unidad,
+        minimo: this.minimo,
+      });
+      this.item = '';
+      this.codigo = '';
+      this.stock = '';
+      this.lugar = '';
+      this.tipo = '';
+      this.unidad = '';
+      this.minimo = '';
+    },
+
   }
 }
 </script>
