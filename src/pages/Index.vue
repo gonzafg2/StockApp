@@ -2,6 +2,7 @@
   <div class="q-pa-md">
     <h4 class="flex flex-center">Stock de Productos</h4>
     <div class="flex flex-center q-pa-md q-gutter-lg">
+      <q-btn unelevated rounded color="positive" label="Ingresar Ítem" size="lg" @click="inputShowAdd" />
       <q-btn unelevated rounded color="primary" label="Entrada" size="lg" />
       <q-btn unelevated rounded color="secondary" label="Salida" size="lg" />
     </div>
@@ -25,52 +26,10 @@
       </template>
     </q-table>
 
-    <div class="q-pa-md">
-    <h5 class="flex flex-center">Ingreso de Productos</h5>
-    <div class="q-gutter-y-md row" style="max-width: 100%">
-      <q-input label="Código" class="col-2" rounded outlined v-model="codigo">
-        <template v-slot:append>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar>
-        </template>
-      </q-input>
-      <div class="flex-break q-px-md"></div>
-      <q-input label="Item" class="col" rounded outlined v-model="item">
-        <template v-slot:append>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar>
-        </template>
-      </q-input>
-      <div class="flex-break q-px-md"></div>
-      <q-input label="Stock" class="col" rounded outlined v-model="stock">
-        <template v-slot:append>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar>
-        </template>
-      </q-input>
-      <div class="flex-break q-px-md"></div>
-      <q-input label="Unidad" class="col" rounded outlined v-model="unidad">
-        <template v-slot:append>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar>
-        </template>
-      </q-input>
-      </div>
-      
-      <div class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
-        <q-input label="Tipo" class="col" rounded outlined v-model="tipo">
-        <template v-slot:append>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar>
-        </template>
-        </q-input>
-        <div class="flex-break q-px-md"></div>
-        <q-input label="Lugar" class="col" rounded outlined v-model="lugar">
+    <div v-if="inputShow" class="q-pa-md">
+      <h5 class="flex flex-center">Ingreso de Productos</h5>
+      <div class="q-gutter-y-md row" style="max-width: 100%">
+        <q-input label="Código" class="col-2" rounded outlined v-model="codigo">
           <template v-slot:append>
             <q-avatar>
               <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -78,20 +37,62 @@
           </template>
         </q-input>
         <div class="flex-break q-px-md"></div>
-        <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo">
+        <q-input label="Item" class="col" rounded outlined v-model="item">
           <template v-slot:append>
             <q-avatar>
               <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
             </q-avatar>
           </template>
         </q-input>
+        <div class="flex-break q-px-md"></div>
+        <q-input label="Stock" class="col" rounded outlined v-model="stock">
+          <template v-slot:append>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+            </q-avatar>
+          </template>
+        </q-input>
+        <div class="flex-break q-px-md"></div>
+        <q-input label="Unidad" class="col" rounded outlined v-model="unidad">
+          <template v-slot:append>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+            </q-avatar>
+          </template>
+        </q-input>
+        </div>
+        
+        <div class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
+          <q-input label="Tipo" class="col" rounded outlined v-model="tipo">
+          <template v-slot:append>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+            </q-avatar>
+          </template>
+          </q-input>
+          <div class="flex-break q-px-md"></div>
+          <q-input label="Lugar" class="col" rounded outlined v-model="lugar">
+            <template v-slot:append>
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+              </q-avatar>
+            </template>
+          </q-input>
+          <div class="flex-break q-px-md"></div>
+          <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo">
+            <template v-slot:append>
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+              </q-avatar>
+            </template>
+          </q-input>
 
+        </div>
+
+        <div class="flex flex-center q-pa-md q-gutter-lg">
+        <q-btn unelevated rounded color="positive" label="Guardar" size="md" @click="guardarItem" />
+        <q-btn outline rounded color="primary" label="Limpiar" size="md" @click="limpiarItem" />
       </div>
-
-      <div class="flex flex-center q-pa-md q-gutter-lg">
-      <q-btn unelevated rounded color="primary" label="Guardar" size="md" @click="guardarItem" />
-      <q-btn unelevated rounded color="warning" label="Limpiar" size="md" @click="limpiarItem" />
-    </div>
 
     </div>
   </div>
@@ -105,6 +106,7 @@ import { QSpinnerFacebook } from 'quasar'
 export default {
   data () {
     return {
+      inputShow: false,
       item: '',
       codigo: '',
       lugar: '',
@@ -145,6 +147,16 @@ export default {
   },
 
   methods: {
+
+    inputShowAdd: function() {
+      
+      if (this.inputShow == false){
+        this.inputShow = true;
+      } else if (this.inputShow == true){
+        this.inputShow = false;
+      }
+    },
+
     async listarInOut(){
       try {
         const spinner = typeof QSpinnerFacebook !== 'undefined'
@@ -239,12 +251,13 @@ export default {
           this.tipo = '';
           this.unidad = '';
           this.minimo = '';
-    
+
           this.$q.notify({
             message: 'El producto se ha guardado exitosamente',
-            color: 'primary',
+            color: 'positive',
             textColor: 'white',
-            icon: 'cloud_done'
+            type: 'positive',
+            position: "top"
           })
       }).onCancel(() => {
         // console.log('>>>> Cancel')
