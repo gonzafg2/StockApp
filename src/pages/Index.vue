@@ -1,10 +1,10 @@
 <template>
   <div class="q-pa-md">
     <h4 class="flex flex-center">Stock de Productos</h4>
-    <div class="flex flex-center q-pa-md q-gutter-lg">
-      <q-btn unelevated rounded color="positive" label="Ingresar Ítem" size="lg" @click="inputShowAdd" />
-      <q-btn unelevated rounded color="primary" label="Entrada" size="lg" />
-      <q-btn unelevated rounded color="secondary" label="Salida" size="lg" />
+    <div class="flex flex-center q-pa-md q-mb-lg q-gutter-lg">
+      <q-btn class="q-pa-sm" unelevated rounded color="positive" label="Ingresar Ítem" size="lg" @click="inputShowAdd" />
+      <q-btn class="q-pa-sm" unelevated rounded color="primary" label="Entrada" size="lg" />
+      <q-btn class="q-pa-sm" unelevated rounded color="secondary" label="Salida" size="lg" />
     </div>
     <q-table
       title="Inventario"
@@ -14,17 +14,50 @@
       :loading="loading"
       :filter="filter"
       :pagination.sync="pagination"
+      :visible-columns="visibleColumns"
       row-key="item"
       rows-per-page-label="Ítems por página"
     >
        <template v-slot:top>
+         <img
+          style="height: 50px; width: 50px"
+          src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg"
+        >
         <q-space />
+
+        <div v-if="$q.screen.gt.xs" class="col flex flex-center">
+          <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="item" label="Item" /> -->
+          <q-toggle class="q-px-sm" v-model="visibleColumns" val="codigo" label="Código" />
+          <q-toggle class="q-px-sm" v-model="visibleColumns" val="stock" label="Stock" />
+          <q-toggle class="q-px-sm" v-model="visibleColumns" val="unidad" label="Unidad" />
+          <q-toggle class="q-px-sm" v-model="visibleColumns" val="tipo" label="Tipo" />
+          <q-toggle class="q-px-sm" v-model="visibleColumns" val="lugar" label="Lugar" />
+          <q-toggle class="q-px-sm" v-model="visibleColumns" val="minimo" label="Stk. Mín." />
+        </div>
+
+        <q-select
+          v-else
+          v-model="visibleColumns"
+          multiple
+          borderless
+          dense
+          options-dense
+          :display-value="$q.lang.table.columns"
+          emit-value
+          map-options
+          :options="columns"
+          option-value="name"
+          style="min-width: 150px"
+        />
+        <q-space />
+
         <q-input borderless dense debounce="300" color="primary" v-model="filter" placeholder="Buscar...">
           <template v-slot:append>
             <q-icon name="search" />
           </template>
         </q-input>
       </template>
+      <!-- <q-btn flat color="red" @click="eliminar(index)">Eliminar</q-btn> -->
     </q-table>
 
     <div v-if="inputShow" class="q-pa-md">
@@ -113,6 +146,7 @@ import { QSpinnerFacebook } from 'quasar'
 export default {
   data () {
     return {
+      visibleColumns: [ 'item', 'codigo', 'lugar', 'tipo', 'unidad', 'minimo','stock' ],
       inputShow: false,
       item: '',
       codigo: '',
@@ -124,7 +158,7 @@ export default {
       loading: false,
       filter: '',
       pagination: {
-        rowsPerPage: 10,
+        rowsPerPage: 5,
       },
       columns: [
         {
@@ -171,14 +205,14 @@ export default {
         : Quasar.components.QSpinnerFacebook // eslint-disable-line
       /* End of Codepen workaround */
 
-        this.$q.loading.show({
-          spinner,
-          spinnerColor: 'indigo',
-          spinnerSize: 140,
-          backgroundColor: 'indigo',
-          message: 'Por favor espere. Se están cargando sus datos...',
-          messageColor: 'white'
-        });
+          this.$q.loading.show({
+            spinner,
+            spinnerColor: 'indigo',
+            spinnerSize: 140,
+            backgroundColor: 'indigo',
+            message: 'Por favor espere. Se están cargando sus datos...',
+            messageColor: 'white'
+          });
 
         const query = await db.collection('productos').get();
         
@@ -197,9 +231,11 @@ export default {
           this.data.push(producto);
         });
         
-      } catch (error) {
+      } 
+      catch (error) {
           console.log(error);
-      } finally {
+      } 
+      finally {
           this.$q.loading.hide();
   }
     },

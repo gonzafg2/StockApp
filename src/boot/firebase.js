@@ -1,5 +1,7 @@
 import * as firebase from "firebase/app";
 import "firebase/firestore";
+import "firebase/performance";
+
 
 // Agregar configuración firebase:
 var firebaseConfig = {
@@ -15,5 +17,7 @@ var firebaseConfig = {
 
 let firebaseApp = firebase.initializeApp(firebaseConfig);
 let db = firebase.firestore();
+const perf = firebase.performance();
+
 
 export { db, firebase };
