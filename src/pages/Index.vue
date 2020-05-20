@@ -1,7 +1,10 @@
 <template>
   <div class="q-px-xl q-mx-xl">
+    <!-- Título de página -->
     <h4 class="flex flex-center">Stock de Productos</h4>
+    <!-- Contenedor para btns de formularios de ingreso -->
     <div class="flex flex-center q-pa-md q-mb-lg q-gutter-lg">
+      <!-- Btn para desplegar formulario de ingreso de producto. -->
       <q-btn
         class="q-pa-sm q-mx-md"
         unelevated
@@ -11,6 +14,7 @@
         size="md"
         @click="inputShowAdd"
       />
+      <!-- Btn para desplegar formulario de entrada de producto. -->
       <q-btn
         class="q-pa-sm q-mx-md"
         unelevated
@@ -19,6 +23,7 @@
         label="Entrada de Stock"
         size="md"
       />
+      <!-- Btn para desplegar formulario de salida de producto. -->
       <q-btn
         class="q-pa-sm q-mx-md"
         unelevated
@@ -28,6 +33,8 @@
         size="md"
       />
     </div>
+
+    <!-- Tabla de Inventario de Productos -->
     <q-table
       :data="data"
       :columns="columns"
@@ -43,41 +50,34 @@
       binary-state-sort
     >
       <template v-slot:top>
-        <!-- <img
-          style="height: 50px; width: 50px"
-          src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg"
-        /> -->
         <q-icon style="font-size: 2.5rem" name="assignment_turned_in" />
         
         <q-space />
 
+        <!-- Contenedor de Toggle para mostrar u ocultar columnas -->
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
-          <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="item" label="Item" /> -->
-          <!-- <q-toggle
-            class="q-px-sm"
-            v-model="visibleColumns"
-            val="codigo"
-            label="Código"
-          /> -->
-          <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="stock" label="Stock" /> -->
+          <!-- Toggle de Columna de Unidad -->
           <q-toggle
             class="q-px-sm"
             v-model="visibleColumns"
             val="unidad"
             label="Unidad"
           />
+          <!-- Toggle de Columna de Tipo -->
           <q-toggle
             class="q-px-sm"
             v-model="visibleColumns"
             val="tipo"
             label="Tipo"
           />
+          <!-- Toggle de Columna de Lugar -->
           <q-toggle
             class="q-px-sm"
             v-model="visibleColumns"
             val="lugar"
             label="Lugar"
           />
+          <!-- Toggle de Columna de Stock Mínimo -->
           <q-toggle
             class="q-px-sm"
             v-model="visibleColumns"
@@ -86,6 +86,7 @@
           />
         </div>
 
+        <!-- ComboBox (Select) de columnas en versión móvil o en anchos pequeños de pantalla -->
         <q-select
           v-else
           v-model="visibleColumns"
@@ -100,8 +101,10 @@
           option-value="name"
           style="min-width: 150px"
         />
+
         <q-space />
 
+        
         <q-input
           borderless
           dense
@@ -110,6 +113,7 @@
           v-model="filter"
           placeholder="Buscar..."
         >
+          <!-- Icono de campo de búsqueda -->
           <template v-slot:append>
             <q-icon name="search" />
           </template>
