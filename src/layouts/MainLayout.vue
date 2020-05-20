@@ -15,7 +15,7 @@
           Control de Existencias
         </q-toolbar-title>
 
-        <div>Kipreos Ingenieros</div>
+        <div>Fleming Science & Technologies</div>
       </q-toolbar>
     </q-header>
 
@@ -61,22 +61,22 @@ export default {
       leftDrawerOpen: false,
       essentialLinks: [
         {
+          title: 'STOCK',
+          caption: 'Inventario de Productos',
+          icon: 'assignment_turned_in',
+          link: '/#'
+        },
+        {
           title: 'ENTRADAS',
-          caption: 'quasar.dev',
-          icon: 'school',
-          link: 'https://quasar.dev'
+          caption: 'Compra o traslado interno',
+          icon: 'trending_down',
+          link: '/entradas'
         },
         {
           title: 'SALIDAS',
-          caption: 'github.com/quasarframework',
-          icon: 'code',
-          link: 'https://github.com/quasarframework'
-        },
-        {
-          title: 'STOCK',
-          caption: 'chat.quasar.dev',
-          icon: 'chat',
-          link: 'https://chat.quasar.dev'
+          caption: 'Venta o traslado interno',
+          icon: 'trending_up',
+          link: '/salidas'
         },
         // {
         //   title: 'Forum',
