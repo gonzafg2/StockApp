@@ -69,16 +69,6 @@
         />
       </template>
 
-      <template v-slot:top-right>
-        <q-btn
-          color="primary"
-          icon-right="delete_forever"
-          no-caps
-          @click="deleteSelected"
-        />
-      </template>
-
-
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
           <q-btn
@@ -87,7 +77,7 @@
           no-caps
           flat
           dense
-          @click="deleteval(data.indexOf(props.row))"
+          @click="deleteval(props.row)"
         />
         </q-td>
       </template>
@@ -236,6 +226,7 @@ export default {
         },
         { name: 'codigo', align: 'center', label: 'Código', field: 'codigo', sortable: true },
         { name: 'stock', label: 'Stock', field: 'stock', sortable: true },
+        { name: 'id', label: 'ID', field: 'id', sortable: true },
         { name: 'unidad', label: 'Unidad', field: 'unidad', sortable: true },
         { name: 'tipo', align: 'center', label: 'Tipo', field: 'tipo', sortable: true },
         { name: 'lugar',align: 'center', label: 'Lugar', field: 'lugar', sortable: true },
@@ -251,21 +242,25 @@ export default {
   },
 
   methods: {
-
     deleteSelected(){
 
       let self = this;
+
       this.selected.filter(function(item){
         self.data.splice(self.data.indexOf(item), 1);
         return item;
       });
+
       this.selected = [];
     },
-    deleteval(index){
+
+
+    async deleteval(index){
+
       console.log(index)
+      // const query = await db.collection('productos').doc(id).delete()
       this.data.splice(index, 1);
       
-      console.log(this.data)
     },
 
 
