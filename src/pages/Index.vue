@@ -43,10 +43,12 @@
       binary-state-sort
     >
       <template v-slot:top>
-        <img
+        <!-- <img
           style="height: 50px; width: 50px"
           src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg"
-        />
+        /> -->
+        <q-icon style="font-size: 2.5rem" name="assignment_turned_in" />
+        
         <q-space />
 
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
