@@ -104,15 +104,13 @@
 
         <q-space />
 
-        
+        <!-- Campo de búsqueda -->
         <q-input
-          borderless
           dense
           debounce="300"
           color="primary"
           v-model="filter"
-          placeholder="Buscar..."
-        >
+          placeholder="Buscar...">
           <!-- Icono de campo de búsqueda -->
           <template v-slot:append>
             <q-icon name="search" />
