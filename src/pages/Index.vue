@@ -15,6 +15,7 @@
       :filter="filter"
       :pagination.sync="pagination"
       row-key="item"
+      rows-per-page-label="Ítems por página"
     >
        <template v-slot:top>
         <q-space />
@@ -123,7 +124,7 @@ export default {
       loading: false,
       filter: '',
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       columns: [
         {
