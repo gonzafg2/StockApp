@@ -413,35 +413,41 @@ export default {
 
     async deleteval(index) {
       // console.log(index);
-      let idF = index.id;
-      const query = await db
-        .collection("productos")
-        .doc(idF)
-        .delete();
-      let indexLocal = this.data.indexOf(index);
-      this.data.splice(indexLocal, 1);
-    },
-
-    eliminarItem(id) {
       this.$q
         .dialog({
           title: "Acción Importante: Requiere Confirmación.",
           message:
-            "¿Está seguro de eliminar este producto dentro de su inventario? \n ¡Esta acción es PERMANENTE!",
+            "¿Está seguro de eliminar este producto de su inventario? \n ¡Esta acción es PERMANENTE!",
           ok: {
             push: true,
-            label: "Sí, eliminar."
+            label: "Sí! Ya no es útil."
           },
           cancel: {
             push: true,
             color: "negative",
-            label: "¡No! Por favor no!"
+            label: "¡No!"
           },
           persistent: true
         })
         .onOk(async () => {
           try {
-            // const query = await db.collection('productos').doc(id).delete()
+            // Borrar en Firebase
+            let idF = index.id;
+            const query = await db
+              .collection("productos")
+              .doc(idF)
+              .delete();
+            // Borrar en LocalStorage
+            let indexLocal = this.data.indexOf(index);
+            await this.data.splice(indexLocal, 1);
+
+            this.$q.notify({
+              message: "El producto se ha eliminado exitosamente",
+              color: "negative",
+              textColor: "white",
+              type: "negative",
+              position: "top"
+            });
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -450,7 +456,7 @@ export default {
               icon: "clear"
             });
           } finally {
-            // this.$q.loading.hide()
+            this.$q.loading.hide();
           }
         });
     },
