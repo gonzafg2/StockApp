@@ -2,12 +2,11 @@
   <div class="q-pa-md">
     <h4 class="flex flex-center">Stock de Productos</h4>
     <div class="flex flex-center q-pa-md q-mb-lg q-gutter-lg">
-      <q-btn class="q-pa-sm" unelevated rounded color="positive" label="Ingresar Ítem" size="lg" @click="inputShowAdd" />
-      <q-btn class="q-pa-sm" unelevated rounded color="primary" label="Entrada" size="lg" />
-      <q-btn class="q-pa-sm" unelevated rounded color="secondary" label="Salida" size="lg" />
+      <q-btn class="q-pa-sm q-mx-md" unelevated rounded color="positive" label="Ingresar Ítem" size="md" @click="inputShowAdd" />
+      <q-btn class="q-pa-sm q-mx-md" unelevated rounded color="primary" label="Entrada de Stock" size="md" />
+      <q-btn class="q-pa-sm q-mx-md" unelevated rounded color="secondary" label="Salida de Stock" size="md" />
     </div>
     <q-table
-      title="Inventario"
       color="primary"
       :data="data"
       :columns="columns"
@@ -17,6 +16,8 @@
       :visible-columns="visibleColumns"
       row-key="item"
       rows-per-page-label="Ítems por página"
+      selection="multiple"
+      :selected.sync="selected"
     >
        <template v-slot:top>
          <img
@@ -28,7 +29,7 @@
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
           <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="item" label="Item" /> -->
           <q-toggle class="q-px-sm" v-model="visibleColumns" val="codigo" label="Código" />
-          <q-toggle class="q-px-sm" v-model="visibleColumns" val="stock" label="Stock" />
+          <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="stock" label="Stock" /> -->
           <q-toggle class="q-px-sm" v-model="visibleColumns" val="unidad" label="Unidad" />
           <q-toggle class="q-px-sm" v-model="visibleColumns" val="tipo" label="Tipo" />
           <q-toggle class="q-px-sm" v-model="visibleColumns" val="lugar" label="Lugar" />
@@ -56,9 +57,69 @@
             <q-icon name="search" />
           </template>
         </q-input>
+
+        <q-space />
+
+        <q-btn
+        class="q-ml-xl"
+          color="negative"
+          icon-right="delete_forever"
+          no-caps
+          @click="deleteSelected"
+        />
+      </template>
+
+      <template v-slot:top-right>
+        <q-btn
+          color="primary"
+          icon-right="delete_forever"
+          no-caps
+          @click="deleteSelected"
+        />
+      </template>
+
+
+      <template v-slot:body-cell-action="props">
+        <q-td :props="props">
+          <q-btn
+          color="negative"
+          icon-right="delete"
+          no-caps
+          flat
+          dense
+          @click="deleteval(data.indexOf(props.row))"
+        />
+        </q-td>
       </template>
       <!-- <q-btn flat color="red" @click="eliminar(index)">Eliminar</q-btn> -->
     </q-table>
+      <!-- <transition-group
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut">
+
+        <div key="delete-key" class="q-mt-lg row" v-if="selected != ''">
+          Ítem a ELIMINAR: 
+          <ul class="q-mt-none col-6">
+            <li class="col-12"><strong>{{ `Código ${selected[0].codigo} - Stock de ${selected[0].codigo} ${selected[0].unidad} - ${selected[0].item}` }}</strong></li>
+          </ul>
+          <q-btn
+          class="col-6"
+            :loading="loading1"
+            :percentage="percentage1"
+            color="negative"
+            @click="eliminarItem(selected[0].id, selected[0].item)"
+            style="width: 250px; height: 64px;"
+          >
+            Eliminar Registro(s)
+            <template v-slot:loading>
+              <q-spinner-gears class="on-left" />
+              Incinerando datos...
+            </template>
+          </q-btn>
+        </div>
+      </transition-group> -->
+
 
     <div v-if="inputShow" class="q-pa-md">
       <transition-group
@@ -146,7 +207,10 @@ import { QSpinnerFacebook } from 'quasar'
 export default {
   data () {
     return {
-      visibleColumns: [ 'item', 'codigo', 'lugar', 'tipo', 'unidad', 'minimo','stock' ],
+      loading1: false,
+      percentage1: 0,
+      selected: [],
+      visibleColumns: [ 'item', 'codigo', 'lugar', 'tipo', 'unidad', 'minimo','stock','action' ],
       inputShow: false,
       item: '',
       codigo: '',
@@ -176,8 +240,7 @@ export default {
         { name: 'tipo', align: 'center', label: 'Tipo', field: 'tipo', sortable: true },
         { name: 'lugar',align: 'center', label: 'Lugar', field: 'lugar', sortable: true },
         { name: 'minimo', label: 'Stock Mínimo', field: 'minimo' },
-        { name: 'eliminar', align: 'center', label: 'Acciones'}
-        // {<q-btn flat color="red" @click="eliminar(index)">Eliminar</q-btn>}
+        { name: 'action', label: 'Acciones', field: 'action' }
       ],
 
       data: []
@@ -188,6 +251,57 @@ export default {
   },
 
   methods: {
+
+    deleteSelected(){
+
+      let self = this;
+      this.selected.filter(function(item){
+        self.data.splice(self.data.indexOf(item), 1);
+        return item;
+      });
+      this.selected = [];
+    },
+    deleteval(index){
+      console.log(index)
+      this.data.splice(index, 1);
+      
+      console.log(this.data)
+    },
+
+
+    eliminarItem(id) {
+
+      this.$q.dialog({
+        title: 'Acción Importante: Requiere Confirmación.',
+        message: '¿Está seguro de eliminar este producto dentro de su inventario? \n ¡Esta acción es PERMANENTE!',
+        ok: {
+          push: true,
+          label: "Sí, eliminar."
+        },
+        cancel: {
+          push: true,
+          color: 'negative',
+          label: "¡No! Por favor no!"
+        },
+        persistent: true
+      }).onOk(async () => {
+
+        try {
+          
+          // const query = await db.collection('productos').doc(id).delete()
+          
+        } catch (error) {
+          this.$q.notify({
+            message: `Ha ocurrido un problema. El error es: ${error}`,
+            color: 'red',
+            textColor: 'white',
+            icon: 'clear'
+          })
+        } finally {
+          // this.$q.loading.hide()
+        }
+      })
+    },
 
     inputShowAdd: function() {
       
@@ -237,7 +351,7 @@ export default {
       } 
       finally {
           this.$q.loading.hide();
-  }
+      }
     },
 
     limpiarItem(){
