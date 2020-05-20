@@ -33,71 +33,72 @@
         leave-active-class="animated fadeOut">
 
         <h5 key="title" class="flex flex-center">Ingreso de Productos</h5>
-        <div key="body" class="q-gutter-y-md row" style="max-width: 100%">
-          <q-input label="Código" class="col-2" rounded outlined v-model="codigo" :rules="[val => !!val || 'Este campo es requerido']">
-            <template v-slot:append>
-              <q-avatar>
-                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-              </q-avatar>
-            </template>
-          </q-input>
-          <div key="body-1" class="flex-break q-px-md"></div>
-          <q-input label="Item" class="col" rounded outlined v-model="item" :rules="[val => !!val || 'Este campo es requerido']">
-            <template v-slot:append>
-              <q-avatar>
-                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-              </q-avatar>
-            </template>
-          </q-input>
-          <div key="body-2" class="flex-break q-px-md"></div>
-          <q-input label="Stock" class="col" rounded outlined v-model="stock" :rules="[val => !!val || 'Este campo es requerido']">
-            <template v-slot:append>
-              <q-avatar>
-                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-              </q-avatar>
-            </template>
-          </q-input>
-          <div key="body-3" class="flex-break q-px-md"></div>
-          <q-input label="Unidad" class="col" rounded outlined v-model="unidad" :rules="[val => !!val || 'Este campo es requerido']">
-            <template v-slot:append>
-              <q-avatar>
-                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-              </q-avatar>
-            </template>
-          </q-input>
-          </div>
+          <q-form key="key-form" @submit="guardarItem" @reset="limpiarItem">
+            <div key="body" class="q-gutter-y-md row" style="max-width: 100%">
+              <q-input label="Código" class="col-2" rounded outlined v-model="codigo" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
+                <template v-slot:append>
+                  <q-avatar>
+                    <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                  </q-avatar>
+                </template>
+              </q-input>
+              <div key="body-1" class="flex-break q-px-md"></div>
+              <q-input label="Item" class="col" rounded outlined v-model="item" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
+                <template v-slot:append>
+                  <q-avatar>
+                    <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                  </q-avatar>
+                </template>
+              </q-input>
+              <div key="body-2" class="flex-break q-px-md"></div>
+              <q-input label="Stock" class="col" rounded outlined v-model="stock" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
+                <template v-slot:append>
+                  <q-avatar>
+                    <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                  </q-avatar>
+                </template>
+              </q-input>
+              <div key="body-3" class="flex-break q-px-md"></div>
+              <q-input label="Unidad" class="col" rounded outlined v-model="unidad" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
+                <template v-slot:append>
+                  <q-avatar>
+                    <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                  </q-avatar>
+                </template>
+              </q-input>
+              </div>
           
-          <div key="body-4" class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
-            <q-input label="Tipo" class="col" rounded outlined v-model="tipo" :rules="[val => !!val || 'Este campo es requerido']">
-            <template v-slot:append>
-              <q-avatar>
-                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-              </q-avatar>
-            </template>
-            </q-input>
-            <div class="flex-break q-px-md"></div>
-            <q-input label="Lugar" class="col" rounded outlined v-model="lugar" :rules="[val => !!val || 'Este campo es requerido']">
+            <div key="body-4" class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
+              <q-input label="Tipo" class="col" rounded outlined v-model="tipo" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
               <template v-slot:append>
                 <q-avatar>
                   <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
                 </q-avatar>
               </template>
-            </q-input>
-            <div class="flex-break q-px-md"></div>
-            <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo" :rules="[val => !!val || 'Este campo es requerido']">
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-                </q-avatar>
-              </template>
-            </q-input>
+              </q-input>
+              <div class="flex-break q-px-md"></div>
+              <q-input label="Lugar" class="col" rounded outlined v-model="lugar" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
+                <template v-slot:append>
+                  <q-avatar>
+                    <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                  </q-avatar>
+                </template>
+              </q-input>
+              <div class="flex-break q-px-md"></div>
+              <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo" lazy-rules :rules="[val => !!val || 'Este campo es requerido']">
+                <template v-slot:append>
+                  <q-avatar>
+                    <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                  </q-avatar>
+                </template>
+              </q-input>
+            </div>
 
-          </div>
-
-          <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
-          <q-btn key="button-1" class="q-pa-sm q-mt-xl" unelevated rounded color="positive" label="Guardar" size="md" @click="guardarItem" />
-          <q-btn key="button-2" class="q-pa-sm q-mt-xl" outline rounded color="primary" label="Limpiar" size="md" @click="limpiarItem" />
-        </div>
+            <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
+              <q-btn type="submit" key="button-1" class="q-pa-sm q-mt-xl" unelevated rounded color="positive" label="Guardar" size="md" />
+              <q-btn type="reset" key="button-2" class="q-pa-sm q-mt-xl" outline rounded color="primary" label="Limpiar" size="md" />
+            </div>
+          </q-form>
       </transition-group>
     </div>
   </div>
