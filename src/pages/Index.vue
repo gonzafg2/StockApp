@@ -431,6 +431,7 @@ export default {
         })
         .onOk(async () => {
           try {
+            this.$q.loading.show();
             // Borrar en Firebase
             let idF = index.id;
             const query = await db
@@ -488,7 +489,7 @@ export default {
 
         const query = await db.collection("productos").get();
 
-        query.forEach(elemento => {
+        await query.forEach(elemento => {
           let producto = {
             id: elemento.id,
             item: elemento.data().item,
@@ -546,7 +547,7 @@ export default {
             minimo: this.minimo
           });
           // console.log('>>>> OK')
-          this.data.push({
+          await this.data.push({
             id: query.id,
             item: this.item,
             codigo: this.codigo,
