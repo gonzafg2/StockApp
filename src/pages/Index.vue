@@ -29,17 +29,18 @@
       />
     </div>
     <q-table
-      color="primary"
       :data="data"
       :columns="columns"
       :loading="loading"
       :filter="filter"
       :pagination.sync="pagination"
       :visible-columns="visibleColumns"
+      :selected.sync="selected"
+      color="primary"
       row-key="item"
       rows-per-page-label="Ítems por página"
       selection="multiple"
-      :selected.sync="selected"
+      binary-state-sort
     >
       <template v-slot:top>
         <img
@@ -50,12 +51,12 @@
 
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
           <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="item" label="Item" /> -->
-          <q-toggle
+          <!-- <q-toggle
             class="q-px-sm"
             v-model="visibleColumns"
             val="codigo"
             label="Código"
-          />
+          /> -->
           <!-- <q-toggle class="q-px-sm" v-model="visibleColumns" val="stock" label="Stock" /> -->
           <q-toggle
             class="q-px-sm"
@@ -121,6 +122,64 @@
           no-caps
           @click="deleteSelected"
         />
+      </template>
+
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td key="desc" :props="props">
+            {{ props.row.name }}
+            <q-popup-edit v-model="props.row.name">
+              <q-input v-model="props.row.name" dense autofocus counter />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="calories" :props="props">
+            {{ props.row.calories }}
+            <q-popup-edit
+              v-model="props.row.calories"
+              title="Update calories"
+              buttons
+            >
+              <q-input
+                type="number"
+                v-model="props.row.calories"
+                dense
+                autofocus
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="fat" :props="props">
+            <div class="text-pre-wrap">{{ props.row.fat }}</div>
+            <q-popup-edit v-model="props.row.fat">
+              <q-input
+                type="textarea"
+                v-model="props.row.fat"
+                dense
+                autofocus
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="carbs" :props="props">
+            {{ props.row.carbs }}
+            <q-popup-edit
+              v-model="props.row.carbs"
+              title="Update carbs"
+              buttons
+              persistent
+            >
+              <q-input
+                type="number"
+                v-model="props.row.carbs"
+                dense
+                autofocus
+                hint="Use buttons to close"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="protein" :props="props">{{ props.row.protein }}</q-td>
+          <q-td key="sodium" :props="props">{{ props.row.sodium }}</q-td>
+          <q-td key="calcium" :props="props">{{ props.row.calcium }}</q-td>
+          <q-td key="iron" :props="props">{{ props.row.iron }}</q-td>
+        </q-tr>
       </template>
 
       <template v-slot:body-cell-action="props">
@@ -557,6 +616,8 @@ export default {
             unidad: this.unidad,
             minimo: this.minimo
           });
+          this.inputShow = false;
+
           this.item = "";
           this.codigo = "";
           this.stock = "";
