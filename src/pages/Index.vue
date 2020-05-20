@@ -27,73 +27,78 @@
     </q-table>
 
     <div v-if="inputShow" class="q-pa-md">
-      <h5 class="flex flex-center">Ingreso de Productos</h5>
-      <div class="q-gutter-y-md row" style="max-width: 100%">
-        <q-input label="Código" class="col-2" rounded outlined v-model="codigo">
-          <template v-slot:append>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-            </q-avatar>
-          </template>
-        </q-input>
-        <div class="flex-break q-px-md"></div>
-        <q-input label="Item" class="col" rounded outlined v-model="item">
-          <template v-slot:append>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-            </q-avatar>
-          </template>
-        </q-input>
-        <div class="flex-break q-px-md"></div>
-        <q-input label="Stock" class="col" rounded outlined v-model="stock">
-          <template v-slot:append>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-            </q-avatar>
-          </template>
-        </q-input>
-        <div class="flex-break q-px-md"></div>
-        <q-input label="Unidad" class="col" rounded outlined v-model="unidad">
-          <template v-slot:append>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-            </q-avatar>
-          </template>
-        </q-input>
-        </div>
-        
-        <div class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
-          <q-input label="Tipo" class="col" rounded outlined v-model="tipo">
-          <template v-slot:append>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-            </q-avatar>
-          </template>
-          </q-input>
-          <div class="flex-break q-px-md"></div>
-          <q-input label="Lugar" class="col" rounded outlined v-model="lugar">
+      <transition-group
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut">
+
+        <h5 key="title" class="flex flex-center">Ingreso de Productos</h5>
+        <div key="body" class="q-gutter-y-md row" style="max-width: 100%">
+          <q-input label="Código" class="col-2" rounded outlined v-model="codigo">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
               </q-avatar>
             </template>
           </q-input>
-          <div class="flex-break q-px-md"></div>
-          <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo">
+          <div key="body-1" class="flex-break q-px-md"></div>
+          <q-input label="Item" class="col" rounded outlined v-model="item">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
               </q-avatar>
             </template>
           </q-input>
+          <div key="body-2" class="flex-break q-px-md"></div>
+          <q-input label="Stock" class="col" rounded outlined v-model="stock">
+            <template v-slot:append>
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+              </q-avatar>
+            </template>
+          </q-input>
+          <div key="body-3" class="flex-break q-px-md"></div>
+          <q-input label="Unidad" class="col" rounded outlined v-model="unidad">
+            <template v-slot:append>
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+              </q-avatar>
+            </template>
+          </q-input>
+          </div>
+          
+          <div key="body-4" class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
+            <q-input label="Tipo" class="col" rounded outlined v-model="tipo">
+            <template v-slot:append>
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+              </q-avatar>
+            </template>
+            </q-input>
+            <div class="flex-break q-px-md"></div>
+            <q-input label="Lugar" class="col" rounded outlined v-model="lugar">
+              <template v-slot:append>
+                <q-avatar>
+                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                </q-avatar>
+              </template>
+            </q-input>
+            <div class="flex-break q-px-md"></div>
+            <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo">
+              <template v-slot:append>
+                <q-avatar>
+                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                </q-avatar>
+              </template>
+            </q-input>
 
+          </div>
+
+          <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
+          <q-btn key="button-1" unelevated rounded color="positive" label="Guardar" size="md" @click="guardarItem" />
+          <q-btn key="button-2" outline rounded color="primary" label="Limpiar" size="md" @click="limpiarItem" />
         </div>
-
-        <div class="flex flex-center q-pa-md q-gutter-lg">
-        <q-btn unelevated rounded color="positive" label="Guardar" size="md" @click="guardarItem" />
-        <q-btn outline rounded color="primary" label="Limpiar" size="md" @click="limpiarItem" />
-      </div>
-
+      </transition-group>
     </div>
   </div>
 
