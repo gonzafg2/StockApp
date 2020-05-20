@@ -34,7 +34,7 @@
 
         <h5 key="title" class="flex flex-center">Ingreso de Productos</h5>
         <div key="body" class="q-gutter-y-md row" style="max-width: 100%">
-          <q-input label="Código" class="col-2" rounded outlined v-model="codigo">
+          <q-input label="Código" class="col-2" rounded outlined v-model="codigo" :rules="[val => !!val || 'Este campo es requerido']">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -42,7 +42,7 @@
             </template>
           </q-input>
           <div key="body-1" class="flex-break q-px-md"></div>
-          <q-input label="Item" class="col" rounded outlined v-model="item">
+          <q-input label="Item" class="col" rounded outlined v-model="item" :rules="[val => !!val || 'Este campo es requerido']">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -50,7 +50,7 @@
             </template>
           </q-input>
           <div key="body-2" class="flex-break q-px-md"></div>
-          <q-input label="Stock" class="col" rounded outlined v-model="stock">
+          <q-input label="Stock" class="col" rounded outlined v-model="stock" :rules="[val => !!val || 'Este campo es requerido']">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -58,7 +58,7 @@
             </template>
           </q-input>
           <div key="body-3" class="flex-break q-px-md"></div>
-          <q-input label="Unidad" class="col" rounded outlined v-model="unidad">
+          <q-input label="Unidad" class="col" rounded outlined v-model="unidad" :rules="[val => !!val || 'Este campo es requerido']">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -68,7 +68,7 @@
           </div>
           
           <div key="body-4" class="q-gutter-y-md q-mt-lg row" style="max-width: 100%">
-            <q-input label="Tipo" class="col" rounded outlined v-model="tipo">
+            <q-input label="Tipo" class="col" rounded outlined v-model="tipo" :rules="[val => !!val || 'Este campo es requerido']">
             <template v-slot:append>
               <q-avatar>
                 <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -76,7 +76,7 @@
             </template>
             </q-input>
             <div class="flex-break q-px-md"></div>
-            <q-input label="Lugar" class="col" rounded outlined v-model="lugar">
+            <q-input label="Lugar" class="col" rounded outlined v-model="lugar" :rules="[val => !!val || 'Este campo es requerido']">
               <template v-slot:append>
                 <q-avatar>
                   <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -84,7 +84,7 @@
               </template>
             </q-input>
             <div class="flex-break q-px-md"></div>
-            <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo">
+            <q-input label="Stock Mínimo" class="col" rounded outlined v-model="minimo" :rules="[val => !!val || 'Este campo es requerido']">
               <template v-slot:append>
                 <q-avatar>
                   <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -95,8 +95,8 @@
           </div>
 
           <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
-          <q-btn key="button-1" unelevated rounded color="positive" label="Guardar" size="md" @click="guardarItem" />
-          <q-btn key="button-2" outline rounded color="primary" label="Limpiar" size="md" @click="limpiarItem" />
+          <q-btn key="button-1" class="q-pa-sm q-mt-xl" unelevated rounded color="positive" label="Guardar" size="md" @click="guardarItem" />
+          <q-btn key="button-2" class="q-pa-sm q-mt-xl" outline rounded color="primary" label="Limpiar" size="md" @click="limpiarItem" />
         </div>
       </transition-group>
     </div>
