@@ -17,7 +17,9 @@
 
         <q-icon style="font-size: 1.25rem" name="code" />
         
-        <div class="q-px-sm"><a style="font-size: inherit; color: inherit; text-decoration: none;" href="https://flemingtech.us">Fleming Science & Technologies</a></div>
+        <div class="q-px-sm">
+          <a style="font-size: inherit; color: inherit; text-decoration: none;" href="https://flemingtech.us">Fleming Science & Technologies</a>
+        </div>
       </q-toolbar>
     </q-header>
 
