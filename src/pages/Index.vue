@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-px-xl q-mx-xl">
     <h4 class="flex flex-center">Stock de Productos</h4>
     <div class="flex flex-center q-pa-md q-mb-lg q-gutter-lg">
       <q-btn
@@ -197,33 +197,8 @@
       <!-- data.indexOf(props.row) -->
       <!-- <q-btn flat color="red" @click="eliminar(index)">Eliminar</q-btn> -->
     </q-table>
-    <!-- <transition-group
-        appear
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut">
 
-        <div key="delete-key" class="q-mt-lg row" v-if="selected != ''">
-          Ítem a ELIMINAR: 
-          <ul class="q-mt-none col-6">
-            <li class="col-12"><strong>{{ `Código ${selected[0].codigo} - Stock de ${selected[0].codigo} ${selected[0].unidad} - ${selected[0].item}` }}</strong></li>
-          </ul>
-          <q-btn
-          class="col-6"
-            :loading="loading1"
-            :percentage="percentage1"
-            color="negative"
-            @click="eliminarItem(selected[0].id, selected[0].item)"
-            style="width: 250px; height: 64px;"
-          >
-            Eliminar Registro(s)
-            <template v-slot:loading>
-              <q-spinner-gears class="on-left" />
-              Incinerando datos...
-            </template>
-          </q-btn>
-        </div>
-      </transition-group> -->
-
+    <!-- Formulario de ingreso de nuevos productos -->
     <div v-if="inputShow" class="q-pa-md">
       <transition-group
         appear
@@ -459,6 +434,7 @@ export default {
   },
 
   methods: {
+    // Eliminación de productos en batch en tabla de existencias.
     deleteSelected() {
       let self = this;
 
@@ -470,6 +446,7 @@ export default {
       this.selected = [];
     },
 
+    // Eliminación de productos de forma individual en tabla de existencias.
     async deleteval(index) {
       // console.log(index);
       this.$q
@@ -521,6 +498,7 @@ export default {
         });
     },
 
+    // Mostrar u ocultar formulario de creación de producto.
     inputShowAdd: function() {
       if (this.inputShow == false) {
         this.inputShow = true;
@@ -529,6 +507,7 @@ export default {
       }
     },
 
+    // Traer datos de Firebase a tabla de existencias.
     async listarInOut() {
       try {
         const spinner =
@@ -568,6 +547,7 @@ export default {
       }
     },
 
+    // Limpiar datos (btn) en formulario de creación de producto.
     limpiarItem() {
       this.item = "";
       this.codigo = "";
@@ -578,6 +558,7 @@ export default {
       this.minimo = "";
     },
 
+    // Guardar datos (btn) en formulario de creación de producto.
     guardarItem() {
       this.$q
         .dialog({
