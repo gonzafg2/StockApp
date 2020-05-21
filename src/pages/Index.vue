@@ -147,7 +147,7 @@
         <q-btn
           class="q-ml-lg"
           color="positive"
-          icon-right="archive"
+          icon-right="cloud_upload"
           label=""
           no-caps
           disable
@@ -163,7 +163,7 @@
         <q-btn
           class="q-ml-sm"
           color="primary"
-          icon-right="archive"
+          icon-right="cloud_download"
           label=""
           no-caps
           @click="exportTable"
