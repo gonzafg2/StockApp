@@ -68,7 +68,7 @@ export default {
           title: 'STOCK',
           caption: 'Inventario de Productos',
           icon: 'assignment_turned_in',
-          link: '/#'
+          link: '/'
         },
         {
           title: 'ENTRADAS',

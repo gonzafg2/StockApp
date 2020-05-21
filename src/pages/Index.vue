@@ -373,7 +373,6 @@
 import { db } from "../boot/firebase";
 import { QSpinnerFacebook } from "quasar";
 import { exportFile } from "quasar";
-import Input from "../components/Input";
 
 // Función que ayuda a la exportación a CSV
 let wrapCsvValue = (val, formatFn) => {
@@ -585,6 +584,9 @@ export default {
             this.$q.loading.show();
 
             // Borrar en Firebase
+            let idArray = this.selected.map(el => el.id).forEach( async id => {
+              const query = await db.collection("productos").doc(id).delete();
+            });
 
             // Borrar en LocalStorage
             let self = this;
@@ -595,7 +597,7 @@ export default {
             // Notificación Popup que confirma la eliminación
             this.$q.notify({
               message:
-                "El(Los) ítem(s) seleccionado(s) se ha(n) eliminado exitosamente",
+                "El o los ítem(s) seleccionado(s) se ha(n) eliminado exitosamente",
               color: "negative",
               textColor: "white",
               type: "negative",
