@@ -43,6 +43,7 @@
       :pagination.sync="pagination"
       :visible-columns="visibleColumns"
       :selected.sync="selected"
+      :selected-rows-label="getSelectedString"
       color="primary"
       row-key="item"
       rows-per-page-label="Ítems por página"
@@ -437,6 +438,23 @@ export default {
   },
 
   methods: {
+    // Traduce y modifica línea inferior de tabla para selección de registros para eliminar
+    getSelectedString() {
+
+      if (this.selected.length === 0) {
+        return ''
+      } else if (this.selected.length === 1) {
+        return `${this.selected.length} ítem${
+            this.selected.length > 1 ? 's' : ''
+          } seleccionado de ${this.data.length}`;
+      } else if (this.selected.length >= 2) {
+        return `${this.selected.length} ítem${
+            this.selected.length > 1 ? 's' : ''
+          } seleccionados de ${this.data.length}`;
+      }
+
+    },
+    
     // Disable a btn de erase in batch
     btnErase() {
       
@@ -450,25 +468,63 @@ export default {
     },
     
     // Eliminación de productos en batch en tabla de existencias.
-    deleteSelected() {
-      let self = this;
+    async deleteSelected() {
+      // Diálogo de confirmación de eliminación en batch
+      this.$q.dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message: "¿Está seguro de eliminar este(os) producto(s) de su inventario? ¡Esta acción es PERMANENTE!",
+          ok: {
+            push: true,
+            label: "Sí! Ya no es(son) útil(es)."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            this.$q.loading.show();
 
-      this.selected.filter(function(item) {
-        self.data.splice(self.data.indexOf(item), 1);
-        return item;
-      });
+            // Borrar en Firebase
 
-      this.selected = [];
+
+            // Borrar en LocalStorage
+            let self = this;
+            this.selected.filter((item) => {
+              self.data.splice(self.data.indexOf(item), 1);
+              return item;
+            });
+            // Notificación Popup que confirma la eliminación
+            this.$q.notify({
+              message: "El(Los) ítem(s) seleccionado(s) se ha(n) eliminado exitosamente",
+              color: "negative",
+              textColor: "white",
+              type: "negative",
+              position: "top"
+            });
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            this.$q.loading.hide();
+            this.selected = [];
+          }
+        })
     },
 
     // Eliminación de productos de forma individual en tabla de existencias.
     async deleteval(index) {
-      // console.log(index);
-      this.$q
-        .dialog({
+      // Diálogo de confirmación de eliminación individual
+      this.$q.dialog({
           title: "Acción Importante: Requiere Confirmación.",
-          message:
-            "¿Está seguro de eliminar este producto de su inventario? \n ¡Esta acción es PERMANENTE!",
+          message: "¿Está seguro de eliminar este producto de su inventario? \n ¡Esta acción es PERMANENTE!",
           ok: {
             push: true,
             label: "Sí! Ya no es útil."
@@ -492,9 +548,9 @@ export default {
             // Borrar en LocalStorage
             let indexLocal = this.data.indexOf(index);
             await this.data.splice(indexLocal, 1);
-
+            // Notificación Popup que confirma la eliminación
             this.$q.notify({
-              message: "El producto se ha eliminado exitosamente",
+              message: "El ítem seleccionado se ha eliminado exitosamente",
               color: "negative",
               textColor: "white",
               type: "negative",
@@ -509,6 +565,7 @@ export default {
             });
           } finally {
             this.$q.loading.hide();
+            this.selected = [];
           }
         });
     },
