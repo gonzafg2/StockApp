@@ -459,7 +459,7 @@ export default {
       loading: false,
       filter: "",
       pagination: {
-        rowsPerPage: 5
+        rowsPerPage: 7
       },
       columns: [
         {
@@ -471,6 +471,8 @@ export default {
           format: val => `${val}`,
           sortable: true
         },
+        { name: "stock", label: "Stock", field: "stock", sortable: true },
+        { name: "unidad", label: "Unidad", field: "unidad", sortable: true },
         {
           name: "codigo",
           align: "center",
@@ -478,9 +480,7 @@ export default {
           field: "codigo",
           sortable: true
         },
-        { name: "stock", label: "Stock", field: "stock", sortable: true },
         { name: "id", label: "ID", field: "id", sortable: true },
-        { name: "unidad", label: "Unidad", field: "unidad", sortable: true },
         {
           name: "tipo",
           align: "center",
