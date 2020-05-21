@@ -1,12 +1,14 @@
 <template>
   <div class="q-px-xl q-mx-xl">
+
     <!-- Título de página -->
     <h4 class="flex flex-center">Stock de Productos</h4>
+
     <!-- Contenedor para btns de formularios de ingreso -->
     <div class="flex flex-center q-pa-md q-mb-lg q-gutter-lg">
       <!-- Btn para desplegar formulario de ingreso de producto. -->
       <q-btn
-        class="q-pa-sm q-mx-md"
+        class="q-pa-sm q-mx-md btn__lspace"
         unelevated
         rounded
         color="positive"
@@ -26,7 +28,7 @@
       </q-btn>
       <!-- Btn para desplegar formulario de entrada de producto. -->
       <q-btn
-        class="q-pa-sm q-mx-md"
+        class="q-pa-sm q-mx-md btn__lspace"
         unelevated
         rounded
         color="primary"
@@ -40,7 +42,7 @@
       </q-btn>
       <!-- Btn para desplegar formulario de salida de producto. -->
       <q-btn
-        class="q-pa-sm q-mx-md"
+        class="q-pa-sm q-mx-md btn__lspace"
         unelevated
         rounded
         color="secondary"
