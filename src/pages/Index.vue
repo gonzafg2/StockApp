@@ -143,9 +143,25 @@
           </template>
         </q-input>
 
-        <!-- Btn de exportar tabla a CSV -->
+        <!-- Btn para carga masiva de productos -->
         <q-btn
           class="q-ml-lg"
+          color="positive"
+          icon-right="archive"
+          label=""
+          no-caps
+          disable
+          @click="importTable"
+        >
+          <!-- Tooltip para mejor indicación al usuario -->
+          <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+            Toca para importar datos a esta tabla.
+          </q-tooltip>
+        </q-btn>
+
+        <!-- Btn de exportar tabla a CSV -->
+        <q-btn
+          class="q-ml-sm"
           color="primary"
           icon-right="archive"
           label=""
@@ -373,6 +389,7 @@
 import { db } from "../boot/firebase";
 import { QSpinnerFacebook } from "quasar";
 import { exportFile } from "quasar";
+import { bigdata } from "../csvjson";
 
 // Función que ayuda a la exportación a CSV
 let wrapCsvValue = (val, formatFn) => {
@@ -728,6 +745,44 @@ export default {
       this.tipo = "";
       this.unidad = "";
       this.minimo = "";
+    },
+
+    // Carga Masiva
+    importTable() {
+      
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message:
+            "¿Está seguro de importar estos datos dentro de su inventario?",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "¡Sí!."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        }).onOk( async () => {
+            try {
+              this.$q.loading.show();
+              const importBigData = bigdata.forEach( async set => {
+                const query = await db.collection('productos').add(set);
+              });
+            } catch (error) {
+              this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+            } finally {
+              this.$q.loading.hide();
+            }
+        });
     },
 
     // Guardar datos (btn) en formulario de creación de producto.
