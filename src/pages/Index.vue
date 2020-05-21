@@ -41,6 +41,7 @@
       :loading="loading"
       :filter="filter"
       :pagination.sync="pagination"
+      :pagination-label="getPaginationLabel"
       :visible-columns="visibleColumns"
       :selected.sync="selected"
       :selected-rows-label="getSelectedString"
@@ -438,9 +439,13 @@ export default {
   },
 
   methods: {
+    // Traduce línea sobre cantidad de filas en tabla de registro
+    getPaginationLabel(firstRowIndex, endRowIndex, totalRowsNumber){
+      return `${firstRowIndex} - ${endRowIndex} de ${totalRowsNumber}`;
+    },
+    
     // Traduce y modifica línea inferior de tabla para selección de registros para eliminar
     getSelectedString() {
-
       if (this.selected.length === 0) {
         return ''
       } else if (this.selected.length === 1) {
@@ -454,7 +459,7 @@ export default {
       }
 
     },
-    
+
     // Disable a btn de erase in batch
     btnErase() {
       
