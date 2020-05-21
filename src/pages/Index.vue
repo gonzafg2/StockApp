@@ -116,10 +116,20 @@
           </template>
         </q-input>
 
+        <!-- Btn de exportar tabla a CSV -->
+        <q-btn
+          class="q-ml-lg"
+          color="primary"
+          icon-right="archive"
+          label=""
+          no-caps
+          @click="exportTable"
+        />
+
         <!-- Btn para eliminación de un barch de productos (varias filas) -->
         <q-btn
           id="btn-erase-batch"
-          class="q-ml-xl"
+          class="q-ml-sm"
           color="negative"
           icon-right="delete_forever"
           no-caps
@@ -360,6 +370,38 @@
 <script>
 import { db } from "../boot/firebase";
 import { QSpinnerFacebook } from "quasar";
+import { exportFile } from 'quasar'
+
+// Función que ayuda a la exportación a CSV
+let  wrapCsvValue = (val, formatFn) => {
+  let formatted = formatFn !== void 0
+    ? formatFn(val)
+    : val
+
+  formatted = formatted === void 0 || formatted === null
+    ? ''
+    : String(formatted)
+
+  formatted = formatted.split('"').join('""')
+  /**
+   * Excel accepts \n and \r in strings, but some other CSV parsers do not
+   * Uncomment the next two lines to escape new lines
+   */
+  // .split('\n').join('\\n')
+  // .split('\r').join('\\r')
+
+  return `"${formatted}"`
+}
+
+//variables para fecha (YYY-Mmm-D) para exportación de CSV
+  var dateObject = new Date();
+  let Day = dateObject.getDate();
+  let Month = dateObject.getMonth();
+  let month = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  let monthShort = month[Month];
+  let Year = dateObject.getFullYear();
+  let dateActual = `${Year}-${monthShort}-${Day}`;
+
 
 export default {
   data() {
@@ -439,6 +481,34 @@ export default {
   },
 
   methods: {
+    // Script para exportar tabla de ítems a archvio CSV
+    exportTable() {
+      // naive encoding to csv format
+      const content = [ this.columns.map(col => wrapCsvValue(col.label)) ].concat(
+        this.data.map(row => this.columns.map(col => wrapCsvValue(
+          typeof col.field === 'function'
+            ? col.field(row)
+            : row[col.field === void 0 ? col.name : col.field],
+          col.format
+        )).join(','))
+      ).join('\r\n')
+
+      const status = exportFile(
+        // 'table-export.csv',
+        `${dateActual}_Inventario.xls`,
+        content,
+        'text/csv'
+      )
+
+      if (status !== true) {
+        this.$q.notify({
+          message: 'Su navegador denegó la descarga del archivo...',
+          color: 'negative',
+          icon: 'warning'
+        })
+      }
+    },
+    
     // Traduce línea sobre cantidad de filas en tabla de registro
     getPaginationLabel(firstRowIndex, endRowIndex, totalRowsNumber){
       return `${firstRowIndex} - ${endRowIndex} de ${totalRowsNumber}`;
