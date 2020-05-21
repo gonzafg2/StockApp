@@ -432,7 +432,7 @@ export default {
   created() {
     this.listarInOut();
   },
-  mounted() {
+  updated() {
     this.btnErase();
   },
 
@@ -443,9 +443,9 @@ export default {
       let btnEraseBatch = document.getElementById("btn-erase-batch");
       
       if (this.selected == '') {
-        btnEraseBatch.setAttribute("disabled", "disabled")
+        btnEraseBatch.setAttribute("disabled", "disabled");
       } else if (this.selected != '') {
-        btnEraseBatch.removeAttribute("disabled")
+        btnEraseBatch.removeAttribute("disabled");
       }
     },
     
