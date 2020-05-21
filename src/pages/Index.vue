@@ -71,6 +71,7 @@
       selection="multiple"
       binary-state-sort
     >
+      <!-- Contenedor de la parte superior de la tabla -->
       <template v-slot:top>
         <!-- Ícono lateral izquierdo de la tabla de productos -->
         <q-icon
@@ -148,7 +149,12 @@
           label=""
           no-caps
           @click="exportTable"
-        />
+        >
+          <!-- Tooltip para mejor indicación al usuario -->
+          <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+            Toca para exportar a un archivo CSV.
+          </q-tooltip>
+        </q-btn>
 
         <!-- Btn para eliminación de un barch de productos (varias filas) -->
         <q-btn
@@ -158,9 +164,16 @@
           icon-right="delete_forever"
           no-caps
           @click="deleteSelected"
-        />
+        >
+          <!-- Tooltip para mejor indicación al usuario -->
+          <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+            Toca para eliminar los ítems seleccionados.
+          </q-tooltip>
+        </q-btn>
       </template>
-
+      
+      <!-- TODO: Edición en línea en tabla -->
+      <!-- Sección para editar en línea --> 
       <!-- <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="desc" :props="props">
@@ -229,7 +242,12 @@
             flat
             dense
             @click="deleteval(props.row)"
-          />
+          >
+            <!-- Tooltip para mejor indicación al usuario -->
+            <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+              Toca para eliminar este ítem.
+            </q-tooltip>
+          </q-btn>
         </q-td>
       </template>
     </q-table>
