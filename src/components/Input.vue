@@ -1,4 +1,3 @@
-
 <template>
 <!-- <h4 class="flex flex-center">Entrada de Productos</h4> -->
   <q-dialog ref="dialog" @hide="onDialogHide">

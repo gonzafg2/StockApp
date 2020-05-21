@@ -12,7 +12,7 @@
         color="positive"
         label="Ingresar Ítem"
         size="md"
-        @click="inputShowAdd"
+        @click="addItem = true"
       >
         <!-- Tooltip para mejor indicación al usuario -->
         <q-tooltip
@@ -152,7 +152,7 @@
         >
           <!-- Tooltip para mejor indicación al usuario -->
           <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
-            Toca para exportar a un archivo CSV.
+            Toca para exportar a un archivo Excel.
           </q-tooltip>
         </q-btn>
 
@@ -252,160 +252,118 @@
       </template>
     </q-table>
 
-    <!-- Formulario de ingreso de nuevos productos -->
-    <div v-if="inputShow" class="q-pa-md">
-      <transition-group
-        appear
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-      >
-        <h5 key="title" class="flex flex-center">Ingreso de Productos</h5>
-        <q-form key="key-form" @submit="guardarItem" @reset="limpiarItem">
-          <div key="body" class="q-gutter-y-md row" style="max-width: 100%">
-            <q-input
-              label="Código"
-              class="col-2"
-              rounded
-              outlined
-              v-model="codigo"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-            <div key="body-1" class="flex-break q-px-md"></div>
-            <q-input
-              label="Item"
-              class="col"
-              rounded
-              outlined
-              v-model="item"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-            <div key="body-2" class="flex-break q-px-md"></div>
-            <q-input
-              label="Stock"
-              class="col"
-              rounded
-              outlined
-              v-model="stock"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-            <div key="body-3" class="flex-break q-px-md"></div>
-            <q-input
-              label="Unidad"
-              class="col"
-              rounded
-              outlined
-              v-model="unidad"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-          </div>
+    <!-- Formulario de ingreso de nuevos productos como ventana modal-->
+    <q-dialog v-model="addItem" persistent transition-show="scale" transition-hide="scale">
+      <q-card>
+        <q-card-section class="row items-center q-pb-sm">
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
+          </q-avatar>
+          <q-space />
+          <div class="text-h6">Ingreso de Producto</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
 
-          <div
-            key="body-4"
-            class="q-gutter-y-md q-mt-lg row"
-            style="max-width: 100%"
-          >
-            <q-input
-              label="Tipo"
-              class="col"
-              rounded
-              outlined
-              v-model="tipo"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-            <div class="flex-break q-px-md"></div>
-            <q-input
-              label="Lugar"
-              class="col"
-              rounded
-              outlined
-              v-model="lugar"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-            <div class="flex-break q-px-md"></div>
-            <q-input
-              label="Stock Mínimo"
-              class="col"
-              rounded
-              outlined
-              v-model="minimo"
-              lazy-rules
-              :rules="[val => !!val || 'Este campo es requerido']"
-            >
-              <template v-slot:append>
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-                </q-avatar>
-              </template>
-            </q-input>
-          </div>
+        <q-card-section>
+          <q-form @submit="guardarItem" @reset="limpiarItem">
+            <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
+              <q-input
+                label="Código"
+                class="col-5"
+                type="number"
+                v-model.number="codigo"
+                :loading="loadingState"
+              />
 
-          <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
-            <q-btn
-              type="submit"
-              key="button-1"
-              class="q-pa-sm q-mt-xl"
-              unelevated
-              rounded
-              color="positive"
-              label="Guardar"
-              size="md"
-            />
-            <q-btn
-              type="reset"
-              key="button-2"
-              class="q-pa-sm q-mt-xl"
-              outline
-              rounded
-              color="primary"
-              label="Limpiar"
-              size="md"
-            />
-          </div>
-        </q-form>
-      </transition-group>
-    </div>
+              <div class="col-2"></div>
+
+              <q-input
+                label="Stock Mínimo"
+                class="col-5"
+                v-model.number="minimo"
+                type="number"
+                :loading="loadingState"
+              />
+
+              <q-input
+                label="Item"
+                class="col-12"
+                v-model="item"
+                clearable
+                autogrow
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+              
+              <q-input
+                label="Stock"
+                class="col-5"
+                v-model.number="stock"
+                type="number"
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+              
+              <div class="col-2"></div>
+
+              <q-input
+                label="Unidad"
+                class="col-5"
+                v-model="unidad"
+                clearable
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <q-input
+                label="Tipo"
+                class="col-12"
+                v-model="tipo"
+                clearable
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+              
+              <q-input
+                label="Lugar"
+                class="col-12"
+                v-model="lugar"
+                clearable
+                :loading="loadingState"
+              />
+            </div>
+
+            <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
+              <q-btn
+                type="submit"
+                key="button-1"
+                class="q-pa-sm q-mt-xl"
+                unelevated
+                rounded
+                color="positive"
+                label="Guardar"
+                size="md"
+              />
+              <q-btn
+                type="reset"
+                key="button-2"
+                class="q-pa-sm q-mt-xl"
+                outline
+                rounded
+                color="primary"
+                label="Limpiar"
+                size="md"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -458,6 +416,8 @@ let dateActual = `${Year}-${monthShort}-${Day}`;
 export default {
   data() {
     return {
+      addItem: false,
+      loadingState: false,
       loading1: false,
       percentage1: 0,
       selected: [],
@@ -471,7 +431,6 @@ export default {
         "stock",
         "action"
       ],
-      inputShow: false,
       item: "",
       codigo: "",
       lugar: "",
@@ -555,7 +514,7 @@ export default {
 
       const status = exportFile(
         // 'table-export.csv',
-        `${dateActual}_Inventario.xls`,
+        `${dateActual}_Inventario.xlsx`,
         content,
         "text/csv"
       );
@@ -708,13 +667,13 @@ export default {
     },
 
     // Mostrar u ocultar formulario de creación de producto.
-    inputShowAdd: function() {
-      if (this.inputShow == false) {
-        this.inputShow = true;
-      } else if (this.inputShow == true) {
-        this.inputShow = false;
-      }
-    },
+    // inputShowAdd: function() {
+    //   if (this.inputShow == false) {
+    //     this.inputShow = true;
+    //   } else if (this.inputShow == true) {
+    //     this.inputShow = false;
+    //   }
+    // },
 
     // Traer datos de Firebase a tabla de existencias.
     async listarInOut() {
@@ -806,7 +765,7 @@ export default {
             unidad: this.unidad,
             minimo: this.minimo
           });
-          this.inputShow = false;
+          this.addItem = false;
 
           this.item = "";
           this.codigo = "";
@@ -815,6 +774,7 @@ export default {
           this.tipo = "";
           this.unidad = "";
           this.minimo = "";
+
 
           this.$q.notify({
             message: "El producto se ha guardado exitosamente",
