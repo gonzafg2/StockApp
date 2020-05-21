@@ -587,6 +587,7 @@ export default {
             "¿Está seguro de eliminar este(os) producto(s) de su inventario? ¡Esta acción es PERMANENTE!",
           ok: {
             push: true,
+            color: "positive",
             label: "Sí! Ya no es(son) útil(es)."
           },
           cancel: {
@@ -644,6 +645,7 @@ export default {
             "¿Está seguro de eliminar este producto de su inventario? \n ¡Esta acción es PERMANENTE!",
           ok: {
             push: true,
+            color: "positive",
             label: "Sí! Ya no es útil."
           },
           cancel: {
@@ -772,6 +774,14 @@ export default {
               const importBigData = bigdata.forEach( async set => {
                 const query = await db.collection('productos').add(set);
               });
+              this.$q.notify({
+              message:
+                "La importación de productos se ha realizado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
             } catch (error) {
               this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -794,6 +804,7 @@ export default {
             "¿Está seguro de guardar este producto dentro de su inventario?",
           ok: {
             push: true,
+            color: "positive",
             label: "Sí, guardar."
           },
           cancel: {
