@@ -1,6 +1,5 @@
 <template>
   <div class="q-px-xl q-mx-xl">
-
     <!-- Título de página -->
     <h4 class="flex flex-center">Stock de Productos</h4>
 
@@ -34,9 +33,15 @@
         color="primary"
         label="Entrada de Stock"
         size="md"
+        @click="addInput = true"
       >
-      <!-- Tooltip para mejor indicación al usuario -->
-        <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+        <!-- Tooltip para mejor indicación al usuario -->
+        <q-tooltip
+          anchor="top middle"
+          self="bottom middle"
+          transition-show="scale"
+          transition-hide="scale"
+        >
           Toca para desplegar el formulario de entrada de ítem.
         </q-tooltip>
       </q-btn>
@@ -48,9 +53,15 @@
         color="secondary"
         label="Salida de Stock"
         size="md"
+        @click="addOutput = true"
       >
-      <!-- Tooltip para mejor indicación al usuario -->
-        <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+        <!-- Tooltip para mejor indicación al usuario -->
+        <q-tooltip
+          anchor="top middle"
+          self="bottom middle"
+          transition-show="scale"
+          transition-hide="scale"
+        >
           Toca para desplegar el formulario de salida de ítem.
         </q-tooltip>
       </q-btn>
@@ -154,7 +165,12 @@
           @click="importTable"
         >
           <!-- Tooltip para mejor indicación al usuario -->
-          <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            transition-show="scale"
+            transition-hide="scale"
+          >
             Toca para importar datos a esta tabla.
           </q-tooltip>
         </q-btn>
@@ -169,7 +185,12 @@
           @click="exportTable"
         >
           <!-- Tooltip para mejor indicación al usuario -->
-          <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            transition-show="scale"
+            transition-hide="scale"
+          >
             Toca para exportar a un archivo Excel.
           </q-tooltip>
         </q-btn>
@@ -184,14 +205,19 @@
           @click="deleteSelected"
         >
           <!-- Tooltip para mejor indicación al usuario -->
-          <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            transition-show="scale"
+            transition-hide="scale"
+          >
             Toca para eliminar los ítems seleccionados.
           </q-tooltip>
         </q-btn>
       </template>
-      
+
       <!-- TODO: Edición en línea en tabla -->
-      <!-- Sección para editar en línea --> 
+      <!-- Sección para editar en línea -->
       <!-- <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="desc" :props="props">
@@ -262,7 +288,12 @@
             @click="deleteval(props.row)"
           >
             <!-- Tooltip para mejor indicación al usuario -->
-            <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+            <q-tooltip
+              anchor="top middle"
+              self="bottom middle"
+              transition-show="scale"
+              transition-hide="scale"
+            >
               Toca para eliminar este ítem.
             </q-tooltip>
           </q-btn>
@@ -271,8 +302,15 @@
     </q-table>
 
     <!-- Formulario de ingreso de nuevos productos como ventana modal-->
-    <q-dialog v-model="addItem" persistent transition-show="scale" transition-hide="scale">
+    <q-dialog
+      v-model="addItem"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <!-- Contenedor principal de ventana modal, dentro están todos los elementos -->
       <q-card>
+        <!-- Sección superior de ventana modal: Ícono lateral, título y btn de cerrado -->
         <q-card-section class="row items-center q-pb-sm">
           <q-avatar>
             <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
@@ -282,9 +320,11 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
-
+        <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
         <q-card-section>
+          <!-- Formulario  -->
           <q-form @submit="guardarItem" @reset="limpiarItem">
+            <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-input
                 label="Código"
@@ -314,7 +354,7 @@
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
-              
+
               <q-input
                 label="Stock"
                 class="col-5"
@@ -324,7 +364,7 @@
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
-              
+
               <div class="col-2"></div>
 
               <q-input
@@ -346,7 +386,7 @@
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
-              
+
               <q-input
                 label="Lugar"
                 class="col-12"
@@ -355,11 +395,10 @@
                 :loading="loadingState"
               />
             </div>
-
-            <div key="body-5" class="flex flex-center q-pa-md q-gutter-lg">
+            <!-- Contenedor de btns de guardado y limpiado de formulario -->
+            <div class="flex flex-center q-pa-md q-gutter-lg">
               <q-btn
                 type="submit"
-                key="button-1"
                 class="q-pa-sm q-mt-xl"
                 unelevated
                 rounded
@@ -369,7 +408,230 @@
               />
               <q-btn
                 type="reset"
-                key="button-2"
+                class="q-pa-sm q-mt-xl"
+                outline
+                rounded
+                color="primary"
+                label="Limpiar"
+                size="md"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Formulario de ENTRADA de nuevos productos como ventana modal-->
+    <q-dialog
+      v-model="addInput"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <!-- Contenedor principal de ventana modal, dentro están todos los elementos -->
+      <q-card>
+        <!-- Sección superior de ventana modal: Ícono lateral, título y btn de cerrado -->
+        <q-card-section class="row items-center q-pb-sm">
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
+          </q-avatar>
+          <q-space />
+          <div class="text-h6">Entrada de Producto</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
+        <q-card-section>
+          <!-- Formulario  -->
+          <q-form @submit="guardarInput" @reset="limpiarInput">
+            <!-- Contenedor interno de formulario -->
+            <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
+              <q-select
+                class="col-9 q-pr-xl"
+                v-model="item"
+                label="Selección de Ítem"
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                hint="Texto autocompletado"
+                @filter="filterFnSelect"
+                :options="options"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              >
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      Sin Resultados
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+
+              <q-input
+                class="col-3"
+                v-model.number="inputCantidad"
+                type="number"
+                label="Cantidad"
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <q-input
+                class="col-5 q-my-md"
+                v-model.number="inputFactura"
+                type="number"
+                label="Factura"
+                :loading="loadingState"
+              />
+
+              <div class="col-2"></div>
+
+              <q-input
+                class="col-5 q-my-md"
+                v-model.number="inputGuia"
+                type="number"
+                label="Guía de Despacho"
+                :loading="loadingState"
+              />
+
+              <q-input
+                class="col-12"
+                type="textarea"
+                v-model="inputObs"
+                label="Observación"
+                :loading="loadingState"
+              />
+            </div>
+
+            <!-- Contenedor de btns de guardado y limpiado de formulario -->
+            <div class="flex flex-center q-pa-md q-gutter-lg">
+              <q-btn
+                type="submit"
+                class="q-pa-sm q-mt-xl"
+                unelevated
+                rounded
+                color="positive"
+                label="Guardar"
+                size="md"
+              />
+              <q-btn
+                type="reset"
+                class="q-pa-sm q-mt-xl"
+                outline
+                rounded
+                color="primary"
+                label="Limpiar"
+                size="md"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Formulario de SALIDA de nuevos productos como ventana modal-->
+    <q-dialog
+      v-model="addOutput"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <!-- Contenedor principal de ventana modal, dentro están todos los elementos -->
+      <q-card>
+        <!-- Sección superior de ventana modal: Ícono lateral, título y btn de cerrado -->
+        <q-card-section class="row items-center q-pb-sm">
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
+          </q-avatar>
+          <q-space />
+          <div class="text-h6">Entrada de Producto</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
+        <q-card-section>
+          <!-- Formulario  -->
+          <q-form @submit="guardarOutput" @reset="limpiarOutput">
+            <!-- Contenedor interno de formulario -->
+            <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
+              <q-select
+                class="col-9 q-pr-xl"
+                v-model="item"
+                label="Selección de Ítem"
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                hint="Texto autocompletado"
+                @filter="filterFnSelect"
+                :options="options"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              >
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      Sin Resultados
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+
+              <q-input
+                class="col-3"
+                v-model.number="outputCantidad"
+                type="number"
+                label="Cantidad"
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <q-input
+                class="col-5 q-my-md"
+                v-model.number="outputFactura"
+                type="number"
+                label="Factura"
+                :loading="loadingState"
+              />
+
+              <div class="col-2"></div>
+
+              <q-input
+                class="col-5 q-my-md"
+                v-model.number="outputGuia"
+                type="number"
+                label="Guía de Despacho"
+                :loading="loadingState"
+              />
+
+              <q-input
+                class="col-12"
+                type="textarea"
+                v-model="outputObs"
+                label="Observación"
+                :loading="loadingState"
+              />
+            </div>
+
+            <!-- Contenedor de btns de guardado y limpiado de formulario -->
+            <div class="flex flex-center q-pa-md q-gutter-lg">
+              <q-btn
+                type="submit"
+                class="q-pa-sm q-mt-xl"
+                unelevated
+                rounded
+                color="positive"
+                label="Guardar"
+                size="md"
+              />
+              <q-btn
+                type="reset"
                 class="q-pa-sm q-mt-xl"
                 outline
                 rounded
@@ -431,14 +693,20 @@ let monthShort = month[Month];
 let Year = dateObject.getFullYear();
 let dateActual = `${Year}-${monthShort}-${Day}`;
 
+const stringOptions = ["Google", "Facebook", "Twitter", "Apple", "Oracle"];
+
 export default {
   data() {
     return {
       addItem: false,
+      addInput: false,
+      addOutput: false,
       loadingState: false,
       loading1: false,
       percentage1: 0,
       selected: [],
+      stringOptions,
+      options: stringOptions,
       visibleColumns: [
         "item",
         "codigo",
@@ -510,6 +778,23 @@ export default {
   },
 
   methods: {
+    //
+    filterFnSelect(val, update) {
+      if (val === "") {
+        update(() => {
+          this.options = stringOptions;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.options = stringOptions.filter(
+          v => v.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+
     // Script para exportar tabla de ítems a archvio CSV
     exportTable() {
       // naive encoding to csv format
@@ -602,9 +887,14 @@ export default {
             this.$q.loading.show();
 
             // Borrar en Firebase
-            let idArray = this.selected.map(el => el.id).forEach( async id => {
-              const query = await db.collection("productos").doc(id).delete();
-            });
+            let idArray = this.selected
+              .map(el => el.id)
+              .forEach(async id => {
+                const query = await db
+                  .collection("productos")
+                  .doc(id)
+                  .delete();
+              });
 
             // Borrar en LocalStorage
             let self = this;
@@ -751,7 +1041,6 @@ export default {
 
     // Carga Masiva
     async importTable() {
-      
       this.$q
         .dialog({
           title: "Acción Importante: Requiere Confirmación.",
@@ -768,13 +1057,14 @@ export default {
             label: "¡No!"
           },
           persistent: true
-        }).onOk( async () => {
-            try {
-              this.$q.loading.show();
-              const importBigData = bigdata.forEach( async set => {
-                const query = await db.collection('productos').add(set);
-              });
-              this.$q.notify({
+        })
+        .onOk(async () => {
+          try {
+            this.$q.loading.show();
+            const importBigData = bigdata.forEach(async set => {
+              const query = await db.collection("productos").add(set);
+            });
+            this.$q.notify({
               message:
                 "La importación de productos se ha realizado exitosamente",
               color: "positive",
@@ -782,16 +1072,16 @@ export default {
               type: "positive",
               position: "top"
             });
-            } catch (error) {
-              this.$q.notify({
+          } catch (error) {
+            this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
               color: "red",
               textColor: "white",
               icon: "clear"
             });
-            } finally {
-              this.$q.loading.hide();
-            }
+          } finally {
+            this.$q.loading.hide();
+          }
         });
     },
 
@@ -844,7 +1134,6 @@ export default {
           this.tipo = "";
           this.unidad = "";
           this.minimo = "";
-
 
           this.$q.notify({
             message: "El producto se ha guardado exitosamente",
