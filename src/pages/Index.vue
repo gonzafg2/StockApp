@@ -323,7 +323,7 @@
         <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
         <q-card-section>
           <!-- Formulario  -->
-          <q-form @submit="guardarItem" @reset="limpiarItem">
+          <q-form @submit="saveFormAddItem" @reset="cleanFormAddItem">
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-input
@@ -444,7 +444,7 @@
         <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
         <q-card-section>
           <!-- Formulario  -->
-          <q-form @submit="guardarInput" @reset="limpiarInput">
+          <q-form @submit="saveAddInput" @reset="limpiarInput">
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-select
@@ -698,15 +698,25 @@ const stringOptions = ["Google", "Facebook", "Twitter", "Apple", "Oracle"];
 export default {
   data() {
     return {
+      // Mostrar modal Agregar Item
       addItem: false,
+      // Mostrar modal Agregar Entrada de Producto
       addInput: false,
+      // Mostrar modal Agregar Salida de Producto
       addOutput: false,
+      // Animación de Carga en Campo de Formulario
       loadingState: false,
+      // Datos para edición in situ en tabla de inventario 
       loading1: false,
       percentage1: 0,
+      // Animación de carga de datos
+      loading: false,
+      // Array vacío para selección de datos en tabla
       selected: [],
+      // Datos para Select de Ítems en Formulario
       stringOptions,
       options: stringOptions,
+      // Columnas Visibles en Tabla de Inventario
       visibleColumns: [
         "item",
         "codigo",
@@ -717,6 +727,7 @@ export default {
         "stock",
         "action"
       ],
+      // Datos para Formulario de Agregar Produto
       item: "",
       codigo: "",
       lugar: "",
@@ -724,11 +735,7 @@ export default {
       minimo: "",
       stock: "",
       unidad: "",
-      loading: false,
-      filter: "",
-      pagination: {
-        rowsPerPage: 7
-      },
+      // Datos para Columnas de Tabla de Inventario
       columns: [
         {
           name: "item",
@@ -766,19 +773,26 @@ export default {
         { name: "minimo", label: "Stock Mínimo", field: "minimo" },
         { name: "action", label: "Acciones", field: "action" }
       ],
+      // Array vacío para función de Filtro en Select de Ítem en Formulario
+      filter: "",
+      // 
+      pagination: {
+        rowsPerPage: 7
+      },
+      
 
       data: []
     };
   },
   created() {
-    this.listarInOut();
+    this.listarInventario();
   },
   updated() {
     this.btnErase();
   },
 
   methods: {
-    //
+    // Función para filtrar en Select 
     filterFnSelect(val, update) {
       if (val === "") {
         update(() => {
@@ -989,7 +1003,8 @@ export default {
     // },
 
     // Traer datos de Firebase a tabla de existencias.
-    async listarInOut() {
+    // async listarInOut() {
+    async listarInventario() {
       try {
         const spinner =
           typeof QSpinnerFacebook !== "undefined"
@@ -1028,8 +1043,18 @@ export default {
       }
     },
 
-    // Limpiar datos (btn) en formulario de creación de producto.
-    limpiarItem() {
+    // Limpiar datos (btn) en formulario de Creación de Producto.
+    cleanFormAddItem() {
+      this.item = "";
+      this.codigo = "";
+      this.stock = "";
+      this.lugar = "";
+      this.tipo = "";
+      this.unidad = "";
+      this.minimo = "";
+    },
+    // Limpiar datos (btn) en formulario de creación de Entrada de Producto.
+    cleanFormAddInput() {
       this.item = "";
       this.codigo = "";
       this.stock = "";
@@ -1086,7 +1111,7 @@ export default {
     },
 
     // Guardar datos (btn) en formulario de creación de producto.
-    guardarItem() {
+    saveFormAddItem() {
       this.$q
         .dialog({
           title: "Acción Importante: Requiere Confirmación.",
@@ -1105,7 +1130,83 @@ export default {
           persistent: true
         })
         .onOk(async () => {
+          try {
           let query = await db.collection("productos").add({
+            item: this.item,
+            codigo: this.codigo,
+            stock: this.stock,
+            lugar: this.lugar,
+            tipo: this.tipo,
+            unidad: this.unidad,
+            minimo: this.minimo
+          });
+          // console.log('>>>> OK')
+          await this.data.push({
+            id: query.id,
+            item: this.item,
+            codigo: this.codigo,
+            stock: this.stock,
+            lugar: this.lugar,
+            tipo: this.tipo,
+            unidad: this.unidad,
+            minimo: this.minimo
+          });
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+              this.addItem = false;
+
+              this.item = "";
+              this.codigo = "";
+              this.stock = "";
+              this.lugar = "";
+              this.tipo = "";
+              this.unidad = "";
+              this.minimo = "";
+
+              this.$q.notify({
+                message: "El producto se ha guardado exitosamente",
+                color: "positive",
+                textColor: "white",
+                type: "positive",
+                position: "top"
+              });
+          }
+        })
+        .onCancel(() => {
+          // console.log('>>>> Cancel')
+        })
+        .onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        });
+    },
+
+    // Guardar datos (btn) en formulario de creación de producto.
+    saveAddInput() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message:
+            "¿Está seguro de guardar esta entrada de producto",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, guardar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          let query = await db.collection("entradas").add({
             item: this.item,
             codigo: this.codigo,
             stock: this.stock,
