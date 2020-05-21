@@ -161,7 +161,7 @@
           icon-right="cloud_upload"
           label=""
           no-caps
-          disable
+          
           @click="importTable"
         >
           <!-- Tooltip para mejor indicación al usuario -->

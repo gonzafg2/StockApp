@@ -16,8 +16,16 @@ var firebaseConfig = {
 };
 
 let firebaseApp = firebase.initializeApp(firebaseConfig);
-let db = firebase.firestore();
+// let db = firebase.firestore();
 const perf = firebase.performance();
 
+var db = firebaseApp.firestore();
+
+if (location.hostname === "localhost") {
+  db.settings({
+    host: "localhost:8080",
+    ssl: false
+  });
+}
 
 export { db, firebase };
