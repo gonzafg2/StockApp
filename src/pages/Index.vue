@@ -371,6 +371,7 @@
 import { db } from "../boot/firebase";
 import { QSpinnerFacebook } from "quasar";
 import { exportFile } from 'quasar'
+import Input from '../components/Input'
 
 // Función que ayuda a la exportación a CSV
 let  wrapCsvValue = (val, formatFn) => {
