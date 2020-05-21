@@ -13,7 +13,17 @@
         label="Ingresar Ítem"
         size="md"
         @click="inputShowAdd"
-      />
+      >
+        <!-- Tooltip para mejor indicación al usuario -->
+        <q-tooltip
+          anchor="top middle"
+          self="bottom middle"
+          transition-show="scale"
+          transition-hide="scale"
+        >
+          Toca para desplegar el formulario de ingreso de ítem.
+        </q-tooltip>
+      </q-btn>
       <!-- Btn para desplegar formulario de entrada de producto. -->
       <q-btn
         class="q-pa-sm q-mx-md"
@@ -22,7 +32,12 @@
         color="primary"
         label="Entrada de Stock"
         size="md"
-      />
+      >
+      <!-- Tooltip para mejor indicación al usuario -->
+        <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+          Toca para desplegar el formulario de entrada de ítem.
+        </q-tooltip>
+      </q-btn>
       <!-- Btn para desplegar formulario de salida de producto. -->
       <q-btn
         class="q-pa-sm q-mx-md"
@@ -31,7 +46,12 @@
         color="secondary"
         label="Salida de Stock"
         size="md"
-      />
+      >
+      <!-- Tooltip para mejor indicación al usuario -->
+        <q-tooltip anchor="top middle" self="bottom middle" transition-show="scale" transition-hide="scale">
+          Toca para desplegar el formulario de salida de ítem.
+        </q-tooltip>
+      </q-btn>
     </div>
 
     <!-- Tabla de Inventario de Productos -->
@@ -53,7 +73,10 @@
     >
       <template v-slot:top>
         <!-- Ícono lateral izquierdo de la tabla de productos -->
-        <q-icon style="font-size: 2.5rem; color: #21BA45" name="assignment_turned_in" />
+        <q-icon
+          style="font-size: 2.5rem; color: #21BA45"
+          name="assignment_turned_in"
+        />
 
         <!-- Contenedor de Toggle para mostrar u ocultar columnas -->
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
@@ -109,7 +132,8 @@
           debounce="300"
           color="primary"
           v-model="filter"
-          placeholder="Buscar...">
+          placeholder="Buscar..."
+        >
           <!-- Icono de campo de búsqueda -->
           <template v-slot:append>
             <q-icon name="search" />
@@ -370,20 +394,17 @@
 <script>
 import { db } from "../boot/firebase";
 import { QSpinnerFacebook } from "quasar";
-import { exportFile } from 'quasar'
-import Input from '../components/Input'
+import { exportFile } from "quasar";
+import Input from "../components/Input";
 
 // Función que ayuda a la exportación a CSV
-let  wrapCsvValue = (val, formatFn) => {
-  let formatted = formatFn !== void 0
-    ? formatFn(val)
-    : val
+let wrapCsvValue = (val, formatFn) => {
+  let formatted = formatFn !== void 0 ? formatFn(val) : val;
 
-  formatted = formatted === void 0 || formatted === null
-    ? ''
-    : String(formatted)
+  formatted =
+    formatted === void 0 || formatted === null ? "" : String(formatted);
 
-  formatted = formatted.split('"').join('""')
+  formatted = formatted.split('"').join('""');
   /**
    * Excel accepts \n and \r in strings, but some other CSV parsers do not
    * Uncomment the next two lines to escape new lines
@@ -391,18 +412,30 @@ let  wrapCsvValue = (val, formatFn) => {
   // .split('\n').join('\\n')
   // .split('\r').join('\\r')
 
-  return `"${formatted}"`
-}
+  return `"${formatted}"`;
+};
 
 //variables para fecha (YYY-Mmm-D) para exportación de CSV
-  var dateObject = new Date();
-  let Day = dateObject.getDate();
-  let Month = dateObject.getMonth();
-  let month = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-  let monthShort = month[Month];
-  let Year = dateObject.getFullYear();
-  let dateActual = `${Year}-${monthShort}-${Day}`;
-
+var dateObject = new Date();
+let Day = dateObject.getDate();
+let Month = dateObject.getMonth();
+let month = [
+  "Ene",
+  "Feb",
+  "Mar",
+  "Abr",
+  "May",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dic"
+];
+let monthShort = month[Month];
+let Year = dateObject.getFullYear();
+let dateActual = `${Year}-${monthShort}-${Day}`;
 
 export default {
   data() {
@@ -485,70 +518,78 @@ export default {
     // Script para exportar tabla de ítems a archvio CSV
     exportTable() {
       // naive encoding to csv format
-      const content = [ this.columns.map(col => wrapCsvValue(col.label)) ].concat(
-        this.data.map(row => this.columns.map(col => wrapCsvValue(
-          typeof col.field === 'function'
-            ? col.field(row)
-            : row[col.field === void 0 ? col.name : col.field],
-          col.format
-        )).join(','))
-      ).join('\r\n')
+      const content = [this.columns.map(col => wrapCsvValue(col.label))]
+        .concat(
+          this.data.map(row =>
+            this.columns
+              .map(col =>
+                wrapCsvValue(
+                  typeof col.field === "function"
+                    ? col.field(row)
+                    : row[col.field === void 0 ? col.name : col.field],
+                  col.format
+                )
+              )
+              .join(",")
+          )
+        )
+        .join("\r\n");
 
       const status = exportFile(
         // 'table-export.csv',
         `${dateActual}_Inventario.xls`,
         content,
-        'text/csv'
-      )
+        "text/csv"
+      );
 
       if (status !== true) {
         this.$q.notify({
-          message: 'Su navegador denegó la descarga del archivo...',
-          color: 'negative',
-          icon: 'warning'
-        })
+          message: "Su navegador denegó la descarga del archivo...",
+          color: "negative",
+          icon: "warning"
+        });
       }
     },
-    
+
     // Traduce línea sobre cantidad de filas en tabla de registro
-    getPaginationLabel(firstRowIndex, endRowIndex, totalRowsNumber){
+    getPaginationLabel(firstRowIndex, endRowIndex, totalRowsNumber) {
       return `${firstRowIndex} - ${endRowIndex} de ${totalRowsNumber}`;
     },
-    
+
     // Traduce y modifica línea inferior de tabla para selección de registros para eliminar
     getSelectedString() {
       if (this.selected.length === 0) {
-        return ''
+        return "";
       } else if (this.selected.length === 1) {
         return `${this.selected.length} ítem${
-            this.selected.length > 1 ? 's' : ''
-          } seleccionado de ${this.data.length}`;
+          this.selected.length > 1 ? "s" : ""
+        } seleccionado de ${this.data.length}`;
       } else if (this.selected.length >= 2) {
         return `${this.selected.length} ítem${
-            this.selected.length > 1 ? 's' : ''
-          } seleccionados de ${this.data.length}`;
+          this.selected.length > 1 ? "s" : ""
+        } seleccionados de ${this.data.length}`;
       }
-
     },
 
     // Disable a btn de erase in batch
     btnErase() {
-      
       let btnEraseBatch = document.getElementById("btn-erase-batch");
-      
-      if (this.selected == '') {
+
+      if (this.selected == "") {
         btnEraseBatch.setAttribute("disabled", "disabled");
-      } else if (this.selected != '') {
+      } else if (this.selected != "") {
         btnEraseBatch.removeAttribute("disabled");
       }
     },
-    
+
     // Eliminación de productos en batch en tabla de existencias.
     async deleteSelected() {
       // Diálogo de confirmación de eliminación en batch
-      this.$q.dialog({
+      this.$q
+        .dialog({
           title: "Acción Importante: Requiere Confirmación.",
-          message: "¿Está seguro de eliminar este(os) producto(s) de su inventario? ¡Esta acción es PERMANENTE!",
+          message:
+            "¿Está seguro de eliminar este(os) producto(s) de su inventario? ¡Esta acción es PERMANENTE!",
           ok: {
             push: true,
             label: "Sí! Ya no es(son) útil(es)."
@@ -566,16 +607,16 @@ export default {
 
             // Borrar en Firebase
 
-
             // Borrar en LocalStorage
             let self = this;
-            this.selected.filter((item) => {
+            this.selected.filter(item => {
               self.data.splice(self.data.indexOf(item), 1);
               return item;
             });
             // Notificación Popup que confirma la eliminación
             this.$q.notify({
-              message: "El(Los) ítem(s) seleccionado(s) se ha(n) eliminado exitosamente",
+              message:
+                "El(Los) ítem(s) seleccionado(s) se ha(n) eliminado exitosamente",
               color: "negative",
               textColor: "white",
               type: "negative",
@@ -592,15 +633,17 @@ export default {
             this.$q.loading.hide();
             this.selected = [];
           }
-        })
+        });
     },
 
     // Eliminación de productos de forma individual en tabla de existencias.
     async deleteval(index) {
       // Diálogo de confirmación de eliminación individual
-      this.$q.dialog({
+      this.$q
+        .dialog({
           title: "Acción Importante: Requiere Confirmación.",
-          message: "¿Está seguro de eliminar este producto de su inventario? \n ¡Esta acción es PERMANENTE!",
+          message:
+            "¿Está seguro de eliminar este producto de su inventario? \n ¡Esta acción es PERMANENTE!",
           ok: {
             push: true,
             label: "Sí! Ya no es útil."
