@@ -50,9 +50,8 @@
       binary-state-sort
     >
       <template v-slot:top>
-        <q-icon style="font-size: 2.5rem" name="assignment_turned_in" />
-        
-        <q-space />
+        <!-- Ícono lateral izquierdo de la tabla de productos -->
+        <q-icon style="font-size: 2.5rem; color: #21BA45" name="assignment_turned_in" />
 
         <!-- Contenedor de Toggle para mostrar u ocultar columnas -->
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
@@ -102,8 +101,6 @@
           style="min-width: 150px"
         />
 
-        <q-space />
-
         <!-- Campo de búsqueda -->
         <q-input
           dense
@@ -117,9 +114,9 @@
           </template>
         </q-input>
 
-        <q-space />
-
+        <!-- Btn para eliminación de un barch de productos (varias filas) -->
         <q-btn
+          id="btn-erase-batch"
           class="q-ml-xl"
           color="negative"
           icon-right="delete_forever"
@@ -128,7 +125,7 @@
         />
       </template>
 
-      <template v-slot:body="props">
+      <!-- <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="desc" :props="props">
             {{ props.row.name }}
@@ -184,8 +181,9 @@
           <q-td key="calcium" :props="props">{{ props.row.calcium }}</q-td>
           <q-td key="iron" :props="props">{{ props.row.iron }}</q-td>
         </q-tr>
-      </template>
+      </template> -->
 
+      <!-- Btn para eliminación de producto (fila) individual -->
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
           <q-btn
@@ -198,8 +196,6 @@
           />
         </q-td>
       </template>
-      <!-- data.indexOf(props.row) -->
-      <!-- <q-btn flat color="red" @click="eliminar(index)">Eliminar</q-btn> -->
     </q-table>
 
     <!-- Formulario de ingreso de nuevos productos -->
@@ -436,8 +432,23 @@ export default {
   created() {
     this.listarInOut();
   },
+  mounted() {
+    this.btnErase();
+  },
 
   methods: {
+    // Disable a btn de erase in batch
+    btnErase() {
+      
+      let btnEraseBatch = document.getElementById("btn-erase-batch");
+      
+      if (this.selected == '') {
+        btnEraseBatch.setAttribute("disabled", "disabled")
+      } else if (this.selected != '') {
+        btnEraseBatch.removeAttribute("disabled")
+      }
+    },
+    
     // Eliminación de productos en batch en tabla de existencias.
     deleteSelected() {
       let self = this;
