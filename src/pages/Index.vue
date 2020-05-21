@@ -750,7 +750,7 @@ export default {
     },
 
     // Carga Masiva
-    importTable() {
+    async importTable() {
       
       this.$q
         .dialog({
