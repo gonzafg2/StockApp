@@ -647,7 +647,7 @@
 </template>
 
 <script>
-import { db } from "../boot/firebase";
+import { db, firebase } from "../boot/firebase";
 import { QSpinnerFacebook } from "quasar";
 import { exportFile } from "quasar";
 import { bigdata } from "../csvjson";
@@ -693,6 +693,10 @@ let Year = dateObject.getFullYear();
 let dateActual = `${Year}-${monthShort}-${Day}`;
 
 const stringOptions = ["Google", "Facebook", "Twitter", "Apple", "Oracle"];
+
+const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+// console.log(timestamp);
 
 export default {
   data() {
@@ -1196,14 +1200,22 @@ export default {
           persistent: true
         })
         .onOk(async () => {
+
+          try {
+            
+          } catch (error) {
+            
+          } finally {
+
+          }
+
           let query = await db.collection("entradas").add({
+            cantidad: this.inputCantidad,
+            factura: this.inputFactura,
+            fecha: timestamp,
+            guia: this.inputGuia,
             item: this.item,
-            codigo: this.codigo,
-            stock: this.stock,
-            lugar: this.lugar,
-            tipo: this.tipo,
-            unidad: this.unidad,
-            minimo: this.minimo
+            observacion: this.inputObs,
           });
           // await this.data.push({
           //   id: query.id,
@@ -1215,15 +1227,13 @@ export default {
           //   unidad: this.unidad,
           //   minimo: this.minimo
           // });
-          this.addItem = false;
+          this.addInput = false;
 
           this.item = "";
-          this.codigo = "";
-          this.stock = "";
-          this.lugar = "";
-          this.tipo = "";
-          this.unidad = "";
-          this.minimo = "";
+          this.inputCantidad = "";
+          this.inputFactura = "";
+          this.inputGuia = "";
+          this.inputObs = "";
 
           this.$q.notify({
             message: "La entrada se ha guardado exitosamente",
