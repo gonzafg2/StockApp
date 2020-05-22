@@ -161,7 +161,6 @@
           icon-right="cloud_upload"
           label=""
           no-caps
-          
           @click="importTable"
         >
           <!-- Tooltip para mejor indicación al usuario -->
@@ -444,7 +443,7 @@
         <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
         <q-card-section>
           <!-- Formulario  -->
-          <q-form @submit="saveAddInput" @reset="limpiarInput">
+          <q-form @submit="saveAddInput" @reset="cleanFormAddInput">
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-select
@@ -706,7 +705,7 @@ export default {
       addOutput: false,
       // Animación de Carga en Campo de Formulario
       loadingState: false,
-      // Datos para edición in situ en tabla de inventario 
+      // Datos para edición in situ en tabla de inventario
       loading1: false,
       percentage1: 0,
       // Animación de carga de datos
@@ -735,6 +734,13 @@ export default {
       minimo: "",
       stock: "",
       unidad: "",
+
+      // Datos para Formulario de Agregar Entrada
+      inputCantidad: "",
+      inputFactura: "",
+      inputGuia: "",
+      inputObs: "",
+
       // Datos para Columnas de Tabla de Inventario
       columns: [
         {
@@ -773,14 +779,16 @@ export default {
         { name: "minimo", label: "Stock Mínimo", field: "minimo" },
         { name: "action", label: "Acciones", field: "action" }
       ],
+
       // Array vacío para función de Filtro en Select de Ítem en Formulario
       filter: "",
-      // 
+
+      // Número de filas a mostrar en tabla inventario.
       pagination: {
         rowsPerPage: 7
       },
-      
 
+      // Array vacío para traer datos de tabla inventario y renderizarlos.
       data: []
     };
   },
@@ -792,7 +800,7 @@ export default {
   },
 
   methods: {
-    // Función para filtrar en Select 
+    // Función para filtrar en Select
     filterFnSelect(val, update) {
       if (val === "") {
         update(() => {
@@ -993,15 +1001,6 @@ export default {
         });
     },
 
-    // Mostrar u ocultar formulario de creación de producto.
-    // inputShowAdd: function() {
-    //   if (this.inputShow == false) {
-    //     this.inputShow = true;
-    //   } else if (this.inputShow == true) {
-    //     this.inputShow = false;
-    //   }
-    // },
-
     // Traer datos de Firebase a tabla de existencias.
     // async listarInOut() {
     async listarInventario() {
@@ -1055,13 +1054,11 @@ export default {
     },
     // Limpiar datos (btn) en formulario de creación de Entrada de Producto.
     cleanFormAddInput() {
-      this.item = "";
-      this.codigo = "";
-      this.stock = "";
-      this.lugar = "";
-      this.tipo = "";
-      this.unidad = "";
-      this.minimo = "";
+      (this.item = ""),
+      (this.inputCantidad = ""),
+      (this.inputFactura = ""),
+      (this.inputGuia = ""),
+      (this.inputObs = "");
     },
 
     // Carga Masiva
@@ -1131,26 +1128,26 @@ export default {
         })
         .onOk(async () => {
           try {
-          let query = await db.collection("productos").add({
-            item: this.item,
-            codigo: this.codigo,
-            stock: this.stock,
-            lugar: this.lugar,
-            tipo: this.tipo,
-            unidad: this.unidad,
-            minimo: this.minimo
-          });
-          // console.log('>>>> OK')
-          await this.data.push({
-            id: query.id,
-            item: this.item,
-            codigo: this.codigo,
-            stock: this.stock,
-            lugar: this.lugar,
-            tipo: this.tipo,
-            unidad: this.unidad,
-            minimo: this.minimo
-          });
+            let query = await db.collection("productos").add({
+              item: this.item,
+              codigo: this.codigo,
+              stock: this.stock,
+              lugar: this.lugar,
+              tipo: this.tipo,
+              unidad: this.unidad,
+              minimo: this.minimo
+            });
+            // console.log('>>>> OK')
+            await this.data.push({
+              id: query.id,
+              item: this.item,
+              codigo: this.codigo,
+              stock: this.stock,
+              lugar: this.lugar,
+              tipo: this.tipo,
+              unidad: this.unidad,
+              minimo: this.minimo
+            });
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -1159,30 +1156,24 @@ export default {
               icon: "clear"
             });
           } finally {
-              this.addItem = false;
+            this.addItem = false;
 
-              this.item = "";
-              this.codigo = "";
-              this.stock = "";
-              this.lugar = "";
-              this.tipo = "";
-              this.unidad = "";
-              this.minimo = "";
+            this.item = "";
+            this.codigo = "";
+            this.stock = "";
+            this.lugar = "";
+            this.tipo = "";
+            this.unidad = "";
+            this.minimo = "";
 
-              this.$q.notify({
-                message: "El producto se ha guardado exitosamente",
-                color: "positive",
-                textColor: "white",
-                type: "positive",
-                position: "top"
-              });
+            this.$q.notify({
+              message: "El producto se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
           }
-        })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        })
-        .onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
         });
     },
 
@@ -1191,8 +1182,7 @@ export default {
       this.$q
         .dialog({
           title: "Acción Importante: Requiere Confirmación.",
-          message:
-            "¿Está seguro de guardar esta entrada de producto",
+          message: "¿Está seguro de guardar esta entrada de producto",
           ok: {
             push: true,
             color: "positive",
@@ -1215,17 +1205,16 @@ export default {
             unidad: this.unidad,
             minimo: this.minimo
           });
-          // console.log('>>>> OK')
-          await this.data.push({
-            id: query.id,
-            item: this.item,
-            codigo: this.codigo,
-            stock: this.stock,
-            lugar: this.lugar,
-            tipo: this.tipo,
-            unidad: this.unidad,
-            minimo: this.minimo
-          });
+          // await this.data.push({
+          //   id: query.id,
+          //   item: this.item,
+          //   codigo: this.codigo,
+          //   stock: this.stock,
+          //   lugar: this.lugar,
+          //   tipo: this.tipo,
+          //   unidad: this.unidad,
+          //   minimo: this.minimo
+          // });
           this.addItem = false;
 
           this.item = "";
@@ -1237,20 +1226,23 @@ export default {
           this.minimo = "";
 
           this.$q.notify({
-            message: "El producto se ha guardado exitosamente",
+            message: "La entrada se ha guardado exitosamente",
             color: "positive",
             textColor: "white",
             type: "positive",
             position: "top"
           });
-        })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        })
-        .onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
         });
     }
+
+    // Mostrar u ocultar formulario de creación de producto.
+    // inputShowAdd: function() {
+    //   if (this.inputShow == false) {
+    //     this.inputShow = true;
+    //   } else if (this.inputShow == true) {
+    //     this.inputShow = false;
+    //   }
+    // },
   }
 };
 </script>
