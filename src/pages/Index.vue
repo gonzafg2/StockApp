@@ -1341,7 +1341,7 @@ export default {
         .onOk(async () => {
           try {
             let query = await db.collection("productos").doc(this.id).update({
-              id: this.id,
+              // id: this.id,
               item: this.item,
               codigo: this.codigo,
               stock: this.stock,
@@ -1491,18 +1491,39 @@ export default {
 
             let getStock = await db.collection("productos").get();
 
-            console.log(this.data);
-
-            await query.forEach(elemento => {
+            let productoTable = [];
+            
+            await getStock.forEach(elemento => {
               let producto = {
                 id: elemento.id,
+                item: elemento.data().item,
                 stock: elemento.data().stock
               };
+              productoTable.push(producto);
             });
-            let update = db
-              .collection("productos")
-              .doc(id)
-              .update({});
+
+            // Buscar Arreglo con objeto que tenga el mismo nombre de Item
+            let filArray = productoTable.filter( fil => fil.item == this.item)
+
+            // Obtener ID de Item Seleccionado
+            let idSelInput = filArray[0].id;
+
+            // Obtener Stock de Item Seleccionado
+            let stockItem = filArray[0].stock;
+
+            let stockSuma = stockItem + this.inputCantidad;
+            console.log(this.inputCantidad);
+            console.log(this.stockSuma);
+
+            // Actualizar campo de stock con dato ingresado en formulario
+            let update = db.collection("productos").doc(idSelInput).update({
+              stock: stockSuma,
+            });
+
+            // let update = db
+            //   .collection("productos")
+            //   .doc(id)
+            //   .update({});
 
             // await this.data.push({
             //   id: query.id,
