@@ -461,14 +461,14 @@
             <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
           </q-avatar>
           <q-space />
-          <div class="text-h6">Ingreso de Producto</div>
+          <div class="text-h6">Actualización de Producto</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
         <q-card-section>
           <!-- Formulario  -->
-          <q-form @submit="saveFormAddItem" @reset="cleanFormAddItem">
+          <q-form @submit="updateFormItem">
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-input
@@ -547,17 +547,8 @@
                 class="q-pa-sm q-mt-xl"
                 unelevated
                 rounded
-                color="positive"
-                label="Guardar"
-                size="md"
-              />
-              <q-btn
-                type="reset"
-                class="q-pa-sm q-mt-xl"
-                outline
-                rounded
                 color="primary"
-                label="Limpiar"
+                label="Actualizar"
                 size="md"
               />
             </div>
@@ -838,13 +829,9 @@ let monthShort = month[Month];
 let Year = dateObject.getFullYear();
 let dateActual = `${Year}-${monthShort}-${Day}`;
 
-// const stringOptions = ["Google", "Facebook", "Twitter", "Apple", "Oracle"];
-
 let stringOptions = [];
 
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-
-// console.log(timestamp);
 
 export default {
   data() {
