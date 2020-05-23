@@ -330,6 +330,76 @@
       </template>
     </q-table>
 
+    <!-- Tabla de Movimientos de Productos -->
+    <q-table
+      :data="inout"
+      :columns="columnsInOut"
+      :loading="loading"
+      :filter="filter"
+      :pagination.sync="pagination"
+      :pagination-label="getPaginationLabel"
+      :visible-columns="visibleColumnsInOut"
+      color="primary"
+      class="fit"
+      row-key="item"
+      rows-per-page-label="Ítems por página"
+      no-results-label="No se encontraron resultados..."
+      :rows-per-page-options="[10]"
+      selection="multiple"
+      binary-state-sort
+    >
+      <!-- Contenedor de la parte superior de la tabla -->
+      <template v-slot:top>
+        <!-- Ícono lateral izquierdo de la tabla de productos -->
+        <q-icon
+          style="font-size: 2.5rem; color: #21BA45"
+          name="assignment_turned_in"
+        />
+
+        <!-- Campo de búsqueda -->
+        <q-input
+          dense
+          debounce="300"
+          class="q-pr-md"
+          color="primary"
+          v-model="filter"
+          placeholder="Buscar..."
+        >
+          <!-- Icono de campo de búsqueda -->
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+
+        <!-- Btn de exportar tabla a CSV -->
+        <q-btn
+          class="q-ml-sm"
+          color="primary"
+          icon-right="cloud_download"
+          label=""
+          no-caps
+          @click="exportTable"
+        >
+          <!-- Tooltip para mejor indicación al usuario -->
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            transition-show="scale"
+            transition-hide="scale"
+          >
+            Toca para exportar a un archivo Excel.
+          </q-tooltip>
+        </q-btn>
+
+      </template>
+
+      <!-- Animación para carga procesos en la tabla de inventario -->
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
+      </template>
+
+    </q-table>
+
     <!-- Formulario de ingreso de nuevos productos como ventana modal-->
     <q-dialog
       v-model="addItem"
@@ -896,6 +966,17 @@ export default {
         "stock",
         "action"
       ],
+      // Columnas Visibles en Tabla de Inventario
+      visibleColumnsInOut: [
+        "item",
+        "codigo",
+        "lugar",
+        "tipo",
+        "unidad",
+        "minimo",
+        "stock",
+        "action"
+      ],
       // Datos para Formulario de Agregar Produto
       id: "",
       item: "",
@@ -905,6 +986,9 @@ export default {
       minimo: "",
       stock: "",
       unidad: "",
+
+      // Datos para Tabla Movimientos
+      id_inout: "",
 
       // Datos para Formulario de Agregar Entrada
       inputItem: "",
@@ -924,6 +1008,27 @@ export default {
 
       // Datos para Update
       idRowTable: null,
+
+      // Datos para Columnas de Tabla de Movimientos
+      columnsInOut: [
+        {
+          name: "fecha",
+          required: true,
+          label: "Fecha",
+          field: row => row.fecha,
+          format: val => `${val}`,
+          sortable: true
+        },
+        { name: "id_inout", label: "ID", field: "id", sortable: true },
+        { name: "codigo", align: "center", label: "Código", field: "codigo", sortable: true },
+        { name: "entrada", label: "Entrada", field: "entrada", sortable: true },
+        { name: "salida", label: "Salida", field: "salida", sortable: true, align: "center" },
+        { name: "factura", label: "Factura", field: "factura", sortable: true, align: "center" },
+        { name: "guia", label: "Guía", field: "guia", sortable: true, align: "center" },
+        { name: "entregado_a", label: "Entregado a:", field: "entregado_a", sortable: true, align: "center" },
+        { name: "observaciones", label: "Observaciones", field: "observaciones", align: "center" },
+        { name: "hoja_registro", label: "Hoja de Registro", field: "hoja_registro", sortable: true, align: "center" },
+      ],
 
       // Datos para Columnas de Tabla de Inventario
       columns: [
@@ -972,8 +1077,11 @@ export default {
         rowsPerPage: 10
       },
 
-      // Array vacío para traer datos de tabla inventario y renderizarlos.
-      data: []
+      // Array vacío para traer datos de Tabla Inventario y renderizarlos.
+      data: [],
+
+      // Array vacío para traer datos de Tabla Movimientos de Stock
+      inout: [],
     };
   },
   created() {
@@ -983,9 +1091,6 @@ export default {
   updated() {
     this.btnErase();
   },
-  // destroyed(){
-  //   this.listarInventario();
-  // },
 
   methods: {
     // Función para filtrar en Select
