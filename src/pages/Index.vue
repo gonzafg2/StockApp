@@ -355,7 +355,7 @@
           style="font-size: 2.5rem; color: #21BA45"
           name="assignment_turned_in"
         />
-
+        <q-space />
         <!-- Campo de búsqueda -->
         <q-input
           dense
