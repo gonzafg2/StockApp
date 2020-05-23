@@ -275,9 +275,30 @@
         </q-tr>
       </template> -->
 
-      <!-- Btn para eliminación de producto (fila) individual -->
+      <!-- Btnes para Acciones (Update & Delete) sobre un Item (fila) individual -->
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
+          <!-- Btn para Actualizar Item -->
+          <q-btn
+            color="primary"
+            icon-right="edit"
+            no-caps
+            flat
+            dense
+            @click="updateval(props.row)"
+          >
+            <!-- Tooltip para mejor indicación al usuario -->
+            <q-tooltip
+              anchor="top middle"
+              self="bottom middle"
+              transition-show="scale"
+              transition-hide="scale"
+            >
+              Toca para actualizar este ítem.
+            </q-tooltip>
+          </q-btn>
+
+          <!-- Btn para Eliminar Item -->
           <q-btn
             color="negative"
             icon-right="delete"
@@ -298,11 +319,136 @@
           </q-btn>
         </q-td>
       </template>
+
+      <!-- Animación para carga procesos en la tabla de inventario -->
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
+      </template>
     </q-table>
 
     <!-- Formulario de ingreso de nuevos productos como ventana modal-->
     <q-dialog
       v-model="addItem"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <!-- Contenedor principal de ventana modal, dentro están todos los elementos -->
+      <q-card>
+        <!-- Sección superior de ventana modal: Ícono lateral, título y btn de cerrado -->
+        <q-card-section class="row items-center q-pb-sm">
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
+          </q-avatar>
+          <q-space />
+          <div class="text-h6">Ingreso de Producto</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
+        <q-card-section>
+          <!-- Formulario  -->
+          <q-form @submit="saveFormAddItem" @reset="cleanFormAddItem">
+            <!-- Contenedor interno de formulario -->
+            <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
+              <q-input
+                label="Código"
+                class="col-5"
+                type="number"
+                v-model.number="codigo"
+                :loading="loadingState"
+              />
+
+              <div class="col-2"></div>
+
+              <q-input
+                label="Stock Mínimo"
+                class="col-5"
+                v-model.number="minimo"
+                type="number"
+                :loading="loadingState"
+              />
+
+              <q-input
+                label="Item"
+                class="col-12"
+                v-model="item"
+                clearable
+                autogrow
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <q-input
+                label="Stock"
+                class="col-5"
+                v-model.number="stock"
+                type="number"
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <div class="col-2"></div>
+
+              <q-input
+                label="Unidad"
+                class="col-5"
+                v-model="unidad"
+                clearable
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <q-input
+                label="Tipo"
+                class="col-12"
+                v-model="tipo"
+                clearable
+                :loading="loadingState"
+                lazy-rules
+                :rules="[val => !!val || 'Este campo es requerido']"
+              />
+
+              <q-input
+                label="Lugar"
+                class="col-12"
+                v-model="lugar"
+                clearable
+                :loading="loadingState"
+              />
+            </div>
+            <!-- Contenedor de btns de guardado y limpiado de formulario -->
+            <div class="flex flex-center q-pa-md q-gutter-lg">
+              <q-btn
+                type="submit"
+                class="q-pa-sm q-mt-xl"
+                unelevated
+                rounded
+                color="positive"
+                label="Guardar"
+                size="md"
+              />
+              <q-btn
+                type="reset"
+                class="q-pa-sm q-mt-xl"
+                outline
+                rounded
+                color="primary"
+                label="Limpiar"
+                size="md"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Formulario de Actualización de Producto Existente como ventana modal-->
+    <q-dialog
+      v-model="updateItem"
       persistent
       transition-show="scale"
       transition-hide="scale"
@@ -454,8 +600,8 @@
                 hide-selected
                 fill-input
                 input-debounce="0"
-                hint="Texto autocompletado"
-                @filter="filterFnSelect"
+                hint="Escribir al menos 2 caracteres..."
+                @filter="filterFn"
                 :options="options"
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
@@ -692,7 +838,9 @@ let monthShort = month[Month];
 let Year = dateObject.getFullYear();
 let dateActual = `${Year}-${monthShort}-${Day}`;
 
-const stringOptions = ["Google", "Facebook", "Twitter", "Apple", "Oracle"];
+// const stringOptions = ["Google", "Facebook", "Twitter", "Apple", "Oracle"];
+
+let stringOptions = [];
 
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
@@ -703,6 +851,8 @@ export default {
     return {
       // Mostrar modal Agregar Item
       addItem: false,
+      // Mostrar modal Actualizar Item
+      updateItem: false,
       // Mostrar modal Agregar Entrada de Producto
       addInput: false,
       // Mostrar modal Agregar Salida de Producto
@@ -717,6 +867,7 @@ export default {
       // Array vacío para selección de datos en tabla
       selected: [],
       // Datos para Select de Ítems en Formulario
+
       stringOptions,
       options: stringOptions,
       // Columnas Visibles en Tabla de Inventario
@@ -740,6 +891,7 @@ export default {
       unidad: "",
 
       // Datos para Formulario de Agregar Entrada
+      inputItem: "",
       inputCantidad: "",
       inputFactura: "",
       inputGuia: "",
@@ -781,7 +933,7 @@ export default {
           sortable: true
         },
         { name: "minimo", label: "Stock Mínimo", field: "minimo" },
-        { name: "action", label: "Acciones", field: "action" }
+        { name: "action", label: "Acciones", field: "action", align: "center" }
       ],
 
       // Array vacío para función de Filtro en Select de Ítem en Formulario
@@ -798,6 +950,7 @@ export default {
   },
   created() {
     this.listarInventario();
+    // this.addItemSelect();
   },
   updated() {
     this.btnErase();
@@ -805,14 +958,11 @@ export default {
 
   methods: {
     // Función para filtrar en Select
-    filterFnSelect(val, update) {
-      if (val === "") {
-        update(() => {
-          this.options = stringOptions;
-        });
+    filterFn(val, update, abort) {
+      if (val.length < 2) {
+        abort();
         return;
       }
-
       update(() => {
         const needle = val.toLowerCase();
         this.options = stringOptions.filter(
@@ -952,6 +1102,47 @@ export default {
     },
 
     // Eliminación de productos de forma individual en tabla de existencias.
+    async updateval(index) {
+      try {
+        // Abrir Modal de Update de Ítem
+        this.updateItem = true;
+
+        // Obtener índice (index) de tabla y guardarlo en idF.
+        let idF = index.id;
+
+        // Obtener los datos de Firebase para mostrar en formulario.
+        const queryGet = await db.collection("productos").doc(idF).get();
+
+        // Mostrar los datos obtenidos en formulario.
+        (this.id = queryGet.id),
+        (this.item = queryGet.data().item),
+        (this.stock = queryGet.data().stock),
+        (this.codigo = queryGet.data().codigo),
+        (this.unidad = queryGet.data().unidad),
+        (this.lugar = queryGet.data().lugar),
+        (this.tipo = queryGet.data().tipo),
+        (this.minimo = queryGet.data().minimo);
+
+      } catch (error) {
+        this.$q.notify({
+          message: `Ha ocurrido un problema. El error es: ${error}`,
+          color: "red",
+          textColor: "white",
+          icon: "clear"
+        });
+      }
+
+        // (this.id = ""),
+        // (this.item = ""),
+        // (this.stock = ""),
+        // (this.codigo = ""),
+        // (this.unidad = ""),
+        // (this.lugar = ""),
+        // (this.tipo = ""),
+        // (this.minimo = "");
+    },
+
+    // Eliminación de productos de forma individual en tabla de existencias.
     async deleteval(index) {
       // Diálogo de confirmación de eliminación individual
       this.$q
@@ -1043,8 +1234,22 @@ export default {
         console.log(error);
       } finally {
         this.$q.loading.hide();
+
+        await this.data.forEach(e => {
+          let das = e.item;
+          this.stringOptions.push(das);
+        });
       }
     },
+
+    // Función para agregar todos los Item a Select
+    // async addItemSelect(){
+    //   await this.data.map(e => {
+    //     let das = e.item;
+    //     return das;
+    //     });
+    //     console.log(das);
+    // },
 
     // Limpiar datos (btn) en formulario de Creación de Producto.
     cleanFormAddItem() {
@@ -1059,10 +1264,10 @@ export default {
     // Limpiar datos (btn) en formulario de creación de Entrada de Producto.
     cleanFormAddInput() {
       (this.item = ""),
-      (this.inputCantidad = ""),
-      (this.inputFactura = ""),
-      (this.inputGuia = ""),
-      (this.inputObs = "");
+        (this.inputCantidad = ""),
+        (this.inputFactura = ""),
+        (this.inputGuia = ""),
+        (this.inputObs = "");
     },
 
     // Carga Masiva
@@ -1086,17 +1291,21 @@ export default {
         })
         .onOk(async () => {
           try {
-            this.$q.loading.show();
+            // TODO: Corregir animación de espera para carga masiva
+            this.loading = true;
             const importBigData = bigdata.forEach(async set => {
               const query = await db.collection("productos").add(set);
-            });
-            this.$q.notify({
-              message:
-                "La importación de productos se ha realizado exitosamente",
-              color: "positive",
-              textColor: "white",
-              type: "positive",
-              position: "top"
+
+              await this.data.push({
+                id: set.id,
+                item: set.item,
+                codigo: set.codigo,
+                stock: set.stock,
+                lugar: set.lugar,
+                tipo: set.tipo,
+                unidad: set.unidad,
+                minimo: set.minimo
+              });
             });
           } catch (error) {
             this.$q.notify({
@@ -1106,7 +1315,87 @@ export default {
               icon: "clear"
             });
           } finally {
-            this.$q.loading.hide();
+            // this.$q.loading.hide();
+            this.loading = false;
+
+            this.$q.notify({
+              message:
+                "La importación de productos se ha realizado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
+          }
+        });
+    },
+
+    // TODO: Actualizar Item (btn edit)
+    updateFormItem() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message:
+            "¿Está seguro de guardar este producto dentro de su inventario?",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, guardar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            let query = await db.collection("productos").add({
+              item: this.item,
+              codigo: this.codigo,
+              stock: this.stock,
+              lugar: this.lugar,
+              tipo: this.tipo,
+              unidad: this.unidad,
+              minimo: this.minimo
+            });
+            // console.log('>>>> OK')
+            await this.data.push({
+              id: query.id,
+              item: this.item,
+              codigo: this.codigo,
+              stock: this.stock,
+              lugar: this.lugar,
+              tipo: this.tipo,
+              unidad: this.unidad,
+              minimo: this.minimo
+            });
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            this.addItem = false;
+
+            this.item = "";
+            this.codigo = "";
+            this.stock = "";
+            this.lugar = "";
+            this.tipo = "";
+            this.unidad = "";
+            this.minimo = "";
+
+            this.$q.notify({
+              message: "El producto se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
           }
         });
     },
@@ -1200,48 +1489,65 @@ export default {
           persistent: true
         })
         .onOk(async () => {
-
           try {
-            
+            let query = await db.collection("entradas").add({
+              cantidad: this.inputCantidad,
+              factura: this.inputFactura,
+              fecha: timestamp,
+              guia: this.inputGuia,
+              item: this.item,
+              observacion: this.inputObs
+            });
+
+            let getStock = await db.collection("productos").get();
+
+            console.log(this.data);
+
+            await query.forEach(elemento => {
+              let producto = {
+                id: elemento.id,
+                stock: elemento.data().stock
+              };
+            });
+            let update = db
+              .collection("productos")
+              .doc(id)
+              .update({});
+
+            // await this.data.push({
+            //   id: query.id,
+            //   item: this.item,
+            //   codigo: this.codigo,
+            //   stock: this.stock,
+            //   lugar: this.lugar,
+            //   tipo: this.tipo,
+            //   unidad: this.unidad,
+            //   minimo: this.minimo
+            // });
           } catch (error) {
-            
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
           } finally {
+            this.addInput = false;
 
+            this.item = "";
+            this.inputCantidad = "";
+            this.inputFactura = "";
+            this.inputGuia = "";
+            this.inputObs = "";
+
+            this.$q.notify({
+              message: "La entrada se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
           }
-
-          let query = await db.collection("entradas").add({
-            cantidad: this.inputCantidad,
-            factura: this.inputFactura,
-            fecha: timestamp,
-            guia: this.inputGuia,
-            item: this.item,
-            observacion: this.inputObs,
-          });
-          // await this.data.push({
-          //   id: query.id,
-          //   item: this.item,
-          //   codigo: this.codigo,
-          //   stock: this.stock,
-          //   lugar: this.lugar,
-          //   tipo: this.tipo,
-          //   unidad: this.unidad,
-          //   minimo: this.minimo
-          // });
-          this.addInput = false;
-
-          this.item = "";
-          this.inputCantidad = "";
-          this.inputFactura = "";
-          this.inputGuia = "";
-          this.inputObs = "";
-
-          this.$q.notify({
-            message: "La entrada se ha guardado exitosamente",
-            color: "positive",
-            textColor: "white",
-            type: "positive",
-            position: "top"
-          });
         });
     }
 
