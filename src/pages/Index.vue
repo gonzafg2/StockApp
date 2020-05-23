@@ -476,7 +476,8 @@
                 class="col-5"
                 type="number"
                 v-model.number="codigo"
-                :loading="loadingState"
+                hint="Sólo lectura" 
+                readonly
               />
 
               <div class="col-2"></div>
@@ -505,9 +506,8 @@
                 class="col-5"
                 v-model.number="stock"
                 type="number"
-                :loading="loadingState"
-                lazy-rules
-                :rules="[val => !!val || 'Este campo es requerido']"
+                hint="Sólo lectura" 
+                readonly
               />
 
               <div class="col-2"></div>
