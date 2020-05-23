@@ -1,10 +1,10 @@
 <template>
-  <div class="q-px-xl q-mx-xl">
+  <div class="containerIndex q-px-xl q-mx-xl">
     <!-- Título de página -->
-    <h4 class="flex flex-center">Stock de Productos</h4>
+    <h4 class="flex flex-center q-pb-none q-mb-lg">Stock de Productos</h4>
 
     <!-- Contenedor para btns de formularios de ingreso -->
-    <div class="flex flex-center q-pa-md q-mb-lg q-gutter-lg">
+    <div class="flex flex-center q-px-md q-mb-lg q-gutter-lg">
       <!-- Btn para desplegar formulario de ingreso de producto. -->
       <q-btn
         class="q-pa-sm q-mx-md btn__lspace"
@@ -79,8 +79,11 @@
       :selected.sync="selected"
       :selected-rows-label="getSelectedString"
       color="primary"
+      class="fit"
       row-key="item"
       rows-per-page-label="Ítems por página"
+      no-results-label="No se encontraron resultados..."
+      :rows-per-page-options="[10]"
       selection="multiple"
       binary-state-sort
     >
@@ -144,6 +147,7 @@
         <q-input
           dense
           debounce="300"
+          class="q-pr-md"
           color="primary"
           v-model="filter"
           placeholder="Buscar..."
@@ -476,7 +480,7 @@
                 class="col-5"
                 type="number"
                 v-model.number="codigo"
-                hint="Sólo lectura" 
+                hint="Sólo lectura"
                 readonly
                 disable
               />
@@ -496,7 +500,7 @@
                 class="col-12"
                 v-model="item"
                 autogrow
-                hint="Sólo lectura" 
+                hint="Sólo lectura"
                 readonly
                 disable
               />
@@ -506,7 +510,7 @@
                 class="col-5"
                 v-model.number="stock"
                 type="number"
-                hint="Sólo lectura" 
+                hint="Sólo lectura"
                 readonly
                 disable
               />
@@ -585,7 +589,7 @@
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-select
-                class="col-9 q-pr-xl"
+                class="col-12"
                 v-model="item"
                 label="Selección de Ítem"
                 use-input
@@ -608,7 +612,7 @@
               </q-select>
 
               <q-input
-                class="col-3"
+                class="col-3 q-mt-lg"
                 v-model.number="inputCantidad"
                 type="number"
                 label="Cantidad"
@@ -617,18 +621,20 @@
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
 
+              <div class="col-1"></div>
+
               <q-input
-                class="col-5 q-my-md"
+                class="col-3 q-mt-none q-pt-xs"
                 v-model.number="inputFactura"
                 type="number"
                 label="Factura"
                 :loading="loadingState"
               />
 
-              <div class="col-2"></div>
+              <div class="col-1"></div>
 
               <q-input
-                class="col-5 q-my-md"
+                class="col-4 q-mt-none q-pt-xs"
                 v-model.number="inputGuia"
                 type="number"
                 label="Guía de Despacho"
@@ -636,7 +642,7 @@
               />
 
               <q-input
-                class="col-12"
+                class="col-12 q-mt-sm"
                 type="textarea"
                 v-model="inputObs"
                 label="Observación"
@@ -685,7 +691,7 @@
             <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
           </q-avatar>
           <q-space />
-          <div class="text-h6">Entrada de Producto</div>
+          <div class="text-h6">Salida de Producto</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
@@ -693,19 +699,19 @@
         <!-- Sección de cuepo de ventana modal: Contiene el formulario -->
         <q-card-section>
           <!-- Formulario  -->
-          <q-form @submit="guardarOutput" @reset="limpiarOutput">
+          <q-form @submit="saveAddOutput" @reset="cleanFormAddOutput">
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
               <q-select
-                class="col-9 q-pr-xl"
+                class="col-12"
                 v-model="item"
                 label="Selección de Ítem"
                 use-input
                 hide-selected
                 fill-input
                 input-debounce="0"
-                hint="Texto autocompletado"
-                @filter="filterFnSelect"
+                hint="Escribir al menos 2 caracteres..."
+                @filter="filterFn"
                 :options="options"
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
@@ -720,7 +726,7 @@
               </q-select>
 
               <q-input
-                class="col-3"
+                class="col-3 q-mt-lg"
                 v-model.number="outputCantidad"
                 type="number"
                 label="Cantidad"
@@ -729,21 +735,42 @@
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
 
+              <div class="col-1"></div>
+
               <q-input
-                class="col-5 q-my-md"
+                class="col-3 q-mt-none q-pt-xs"
                 v-model.number="outputFactura"
                 type="number"
                 label="Factura"
                 :loading="loadingState"
               />
 
-              <div class="col-2"></div>
+              <div class="col-1"></div>
 
               <q-input
-                class="col-5 q-my-md"
+                class="col-4 q-mt-none q-pt-xs"
                 v-model.number="outputGuia"
                 type="number"
                 label="Guía de Despacho"
+                :loading="loadingState"
+              />
+
+              <q-input
+                class="col-7"
+                v-model="outputEntregado"
+                label="Entregado a:"
+                :loading="loadingState"
+                hint=""
+              />
+
+              <div class="col-1"></div>
+
+              <q-input
+                class="col-4"
+                v-model.number="outputHojaRegistro"
+                type="number"
+                label="Registro"
+                hint="Número de hoja"
                 :loading="loadingState"
               />
 
@@ -886,6 +913,15 @@ export default {
       inputGuia: "",
       inputObs: "",
 
+      // Datos para Formulario de Agregar Entrada
+      outputItem: "",
+      outputCantidad: "",
+      outputEntregado: "",
+      outputHojaRegistro: "",
+      outputFactura: "",
+      outputGuia: "",
+      outputObs: "",
+
       // Datos para Update
       idRowTable: null,
 
@@ -933,7 +969,7 @@ export default {
 
       // Número de filas a mostrar en tabla inventario.
       pagination: {
-        rowsPerPage: 7
+        rowsPerPage: 10
       },
 
       // Array vacío para traer datos de tabla inventario y renderizarlos.
@@ -1105,22 +1141,24 @@ export default {
         // Obtener el objeto de la fila completa de tabla y guardarlo en idF.
         let idF = index.id;
 
-        // 
+        //
         this.idRowTable = this.data.indexOf(index);
 
         // Obtener los datos de Firebase para mostrar en formulario.
-        const queryGet = await db.collection("productos").doc(idF).get();
+        const queryGet = await db
+          .collection("productos")
+          .doc(idF)
+          .get();
 
         // Mostrar los datos obtenidos en formulario.
         (this.id = queryGet.id),
-        (this.item = queryGet.data().item),
-        (this.stock = queryGet.data().stock),
-        (this.codigo = queryGet.data().codigo),
-        (this.unidad = queryGet.data().unidad),
-        (this.lugar = queryGet.data().lugar),
-        (this.tipo = queryGet.data().tipo),
-        (this.minimo = queryGet.data().minimo);
-
+          (this.item = queryGet.data().item),
+          (this.stock = queryGet.data().stock),
+          (this.codigo = queryGet.data().codigo),
+          (this.unidad = queryGet.data().unidad),
+          (this.lugar = queryGet.data().lugar),
+          (this.tipo = queryGet.data().tipo),
+          (this.minimo = queryGet.data().minimo);
       } catch (error) {
         this.$q.notify({
           message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -1231,15 +1269,6 @@ export default {
       }
     },
 
-    // Función para agregar todos los Item a Select
-    // async addItemSelect(){
-    //   await this.data.map(e => {
-    //     let das = e.item;
-    //     return das;
-    //     });
-    //     console.log(das);
-    // },
-
     // Limpiar datos (btn) en formulario de Creación de Producto.
     cleanFormAddItem() {
       this.item = "";
@@ -1250,13 +1279,25 @@ export default {
       this.unidad = "";
       this.minimo = "";
     },
-    // Limpiar datos (btn) en formulario de creación de Entrada de Producto.
+
+    // Limpiar datos (btn) en formulario de ENTRADA de Producto.
     cleanFormAddInput() {
       (this.item = ""),
-        (this.inputCantidad = ""),
-        (this.inputFactura = ""),
-        (this.inputGuia = ""),
-        (this.inputObs = "");
+      (this.inputCantidad = ""),
+      (this.inputFactura = ""),
+      (this.inputGuia = ""),
+      (this.inputObs = "");
+    },
+
+    // Limpiar datos (btn) en formulario de SALIDA de Producto.
+    cleanFormAddOutput() {
+      (this.item = ""),
+      (this.outputCantidad = ""),
+      (this.outputFactura = ""),
+      (this.outputGuia = ""),
+      (this.outputEntregado = "");
+      (this.outputHojaRegistro = "");
+      (this.outputObs = "");
     },
 
     // Carga Masiva
@@ -1340,25 +1381,27 @@ export default {
         })
         .onOk(async () => {
           try {
-            let query = await db.collection("productos").doc(this.id).update({
-              // id: this.id,
-              item: this.item,
-              codigo: this.codigo,
-              stock: this.stock,
-              lugar: this.lugar,
-              tipo: this.tipo,
-              unidad: this.unidad,
-              minimo: this.minimo
-            });
+            let query = await db
+              .collection("productos")
+              .doc(this.id)
+              .update({
+                // id: this.id,
+                item: this.item,
+                codigo: this.codigo,
+                stock: this.stock,
+                lugar: this.lugar,
+                tipo: this.tipo,
+                unidad: this.unidad,
+                minimo: this.minimo
+              });
             // this.data[this.idRowTable].id = this.id
             // this.data[this.idRowTable].item = this.item
             // this.data[this.idRowTable].codigo = this.codigo
             // this.data[this.idRowTable].stock = this.stock
-            this.data[this.idRowTable].lugar = this.lugar
-            this.data[this.idRowTable].tipo = this.tipo
-            this.data[this.idRowTable].unidad = this.unidad
-            this.data[this.idRowTable].minimo = this.minimo
-            
+            this.data[this.idRowTable].lugar = this.lugar;
+            this.data[this.idRowTable].tipo = this.tipo;
+            this.data[this.idRowTable].unidad = this.unidad;
+            this.data[this.idRowTable].minimo = this.minimo;
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -1390,7 +1433,7 @@ export default {
         });
     },
 
-    // Guardar datos (btn) en formulario de creación de producto.
+    // Guardar datos (btn) en formulario de CREACION de Producto.
     saveFormAddItem() {
       this.$q
         .dialog({
@@ -1460,7 +1503,7 @@ export default {
         });
     },
 
-    // Guardar datos (btn) en formulario de creación de producto.
+    // Guardar datos (btn) en formulario de ENTRADA de Producto.
     saveAddInput() {
       this.$q
         .dialog({
@@ -1492,7 +1535,7 @@ export default {
             let getStock = await db.collection("productos").get();
 
             let productoTable = [];
-            
+
             await getStock.forEach(elemento => {
               let producto = {
                 id: elemento.id,
@@ -1503,7 +1546,7 @@ export default {
             });
 
             // Buscar Arreglo con objeto que tenga el mismo nombre de Item
-            let filArray = productoTable.filter( fil => fil.item == this.item)
+            let filArray = productoTable.filter(fil => fil.item == this.item);
 
             // Obtener ID de Item Seleccionado
             let idSelInput = filArray[0].id;
@@ -1512,29 +1555,14 @@ export default {
             let stockItem = filArray[0].stock;
 
             let stockSuma = stockItem + this.inputCantidad;
-            console.log(this.inputCantidad);
-            console.log(this.stockSuma);
 
             // Actualizar campo de stock con dato ingresado en formulario
-            let update = db.collection("productos").doc(idSelInput).update({
-              stock: stockSuma,
-            });
-
-            // let update = db
-            //   .collection("productos")
-            //   .doc(id)
-            //   .update({});
-
-            // await this.data.push({
-            //   id: query.id,
-            //   item: this.item,
-            //   codigo: this.codigo,
-            //   stock: this.stock,
-            //   lugar: this.lugar,
-            //   tipo: this.tipo,
-            //   unidad: this.unidad,
-            //   minimo: this.minimo
-            // });
+            let update = db
+              .collection("productos")
+              .doc(idSelInput)
+              .update({
+                stock: stockSuma
+              });
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -1560,16 +1588,98 @@ export default {
             });
           }
         });
-    }
+    },
 
-    // Mostrar u ocultar formulario de creación de producto.
-    // inputShowAdd: function() {
-    //   if (this.inputShow == false) {
-    //     this.inputShow = true;
-    //   } else if (this.inputShow == true) {
-    //     this.inputShow = false;
-    //   }
-    // },
+    // Guardar datos (btn) en formulario de SALIDA de Producto.
+    saveAddOutput() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message: "¿Está seguro de guardar esta salida de producto",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, guardar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            let query = await db.collection("salidas").add({
+              cantidad: this.outputCantidad,
+              factura: this.outputFactura,
+              fecha: timestamp,
+              guia: this.outputGuia,
+              entregado_a: this.outputEntregado,
+              hoja_registro: this.outputHojaRegistro,
+              item: this.item,
+              observacion: this.outputObs
+            });
+
+            let getStock = await db.collection("productos").get();
+
+            let productoTable = [];
+
+            await getStock.forEach(elemento => {
+              let producto = {
+                id: elemento.id,
+                item: elemento.data().item,
+                stock: elemento.data().stock
+              };
+              productoTable.push(producto);
+            });
+
+            // Buscar Arreglo con objeto que tenga el mismo nombre de Item
+            let filArray = productoTable.filter(fil => fil.item == this.item);
+
+            // Obtener ID de Item Seleccionado
+            let idSelOutput = filArray[0].id;
+
+            // Obtener Stock de Item Seleccionado
+            let stockItem = filArray[0].stock;
+
+            let stockSuma = stockItem - this.outputCantidad;
+
+            // Actualizar campo de stock con dato ingresado en formulario
+            let update = db
+              .collection("productos")
+              .doc(idSelOutput)
+              .update({
+                stock: stockSuma
+              });
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            this.addOutput = false;
+
+            this.item = "";
+            this.outputCantidad = "";
+            this.outputFactura = "";
+            this.outputGuia = "";
+            this.outputEntregado = "";
+            this.outputHojaRegistro = "";
+            this.outputObs = "";
+
+            this.$q.notify({
+              message: "La salida se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
+          }
+        });
+    }
   }
 };
 </script>

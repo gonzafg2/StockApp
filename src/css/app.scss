@@ -2,3 +2,21 @@
 .btn__lspace {
   letter-spacing: 1px;
 }
+
+@media screen and (max-width: 1199px) {
+  .containerIndex {
+    padding: 0 8%;
+  }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1480px) {
+  .containerIndex{
+    padding: 0 1%;
+  }
+}
+
+@media screen and (min-width: 1481px) {
+  .containerIndex {
+    padding: 0 15%;
+  }
+}
