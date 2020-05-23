@@ -25,6 +25,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 firebase-debug.log
+database-debug.log
+pubsub-debug.log
 
 # Editor directories and files
 .idea
