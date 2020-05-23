@@ -478,6 +478,7 @@
                 v-model.number="codigo"
                 hint="Sólo lectura" 
                 readonly
+                disable
               />
 
               <div class="col-2"></div>
@@ -494,11 +495,10 @@
                 label="Item"
                 class="col-12"
                 v-model="item"
-                clearable
                 autogrow
-                :loading="loadingState"
-                lazy-rules
-                :rules="[val => !!val || 'Este campo es requerido']"
+                hint="Sólo lectura" 
+                readonly
+                disable
               />
 
               <q-input
@@ -508,6 +508,7 @@
                 type="number"
                 hint="Sólo lectura" 
                 readonly
+                disable
               />
 
               <div class="col-2"></div>
@@ -885,6 +886,9 @@ export default {
       inputGuia: "",
       inputObs: "",
 
+      // Datos para Update
+      idRowTable: null,
+
       // Datos para Columnas de Tabla de Inventario
       columns: [
         {
@@ -943,6 +947,9 @@ export default {
   updated() {
     this.btnErase();
   },
+  // destroyed(){
+  //   this.listarInventario();
+  // },
 
   methods: {
     // Función para filtrar en Select
@@ -1089,14 +1096,17 @@ export default {
         });
     },
 
-    // Eliminación de productos de forma individual en tabla de existencias.
+    // Actualización de productos de forma individual en tabla de existencias.
     async updateval(index) {
       try {
         // Abrir Modal de Update de Ítem
         this.updateItem = true;
 
-        // Obtener índice (index) de tabla y guardarlo en idF.
+        // Obtener el objeto de la fila completa de tabla y guardarlo en idF.
         let idF = index.id;
+
+        // 
+        this.idRowTable = this.data.indexOf(index);
 
         // Obtener los datos de Firebase para mostrar en formulario.
         const queryGet = await db.collection("productos").doc(idF).get();
@@ -1331,6 +1341,7 @@ export default {
         .onOk(async () => {
           try {
             let query = await db.collection("productos").doc(this.id).update({
+              id: this.id,
               item: this.item,
               codigo: this.codigo,
               stock: this.stock,
@@ -1339,16 +1350,15 @@ export default {
               unidad: this.unidad,
               minimo: this.minimo
             });
-            await this.data.push({
-              // id: query.id,
-              item: this.item,
-              codigo: this.codigo,
-              stock: this.stock,
-              lugar: this.lugar,
-              tipo: this.tipo,
-              unidad: this.unidad,
-              minimo: this.minimo
-            });
+            // this.data[this.idRowTable].id = this.id
+            // this.data[this.idRowTable].item = this.item
+            // this.data[this.idRowTable].codigo = this.codigo
+            // this.data[this.idRowTable].stock = this.stock
+            this.data[this.idRowTable].lugar = this.lugar
+            this.data[this.idRowTable].tipo = this.tipo
+            this.data[this.idRowTable].unidad = this.unidad
+            this.data[this.idRowTable].minimo = this.minimo
+            
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -1357,6 +1367,7 @@ export default {
               icon: "clear"
             });
           } finally {
+            // this.reload(true);
             this.updateItem = false;
 
             this.id = "";
