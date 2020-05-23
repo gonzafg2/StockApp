@@ -869,6 +869,7 @@ export default {
         "action"
       ],
       // Datos para Formulario de Agregar Produto
+      id: "",
       item: "",
       codigo: "",
       lugar: "",
@@ -1118,15 +1119,6 @@ export default {
           icon: "clear"
         });
       }
-
-        // (this.id = ""),
-        // (this.item = ""),
-        // (this.stock = ""),
-        // (this.codigo = ""),
-        // (this.unidad = ""),
-        // (this.lugar = ""),
-        // (this.tipo = ""),
-        // (this.minimo = "");
     },
 
     // Eliminación de productos de forma individual en tabla de existencias.
@@ -1317,17 +1309,17 @@ export default {
         });
     },
 
-    // TODO: Actualizar Item (btn edit)
+    // Actualizar Item (btn edit)
     updateFormItem() {
       this.$q
         .dialog({
           title: "Acción Importante: Requiere Confirmación.",
           message:
-            "¿Está seguro de guardar este producto dentro de su inventario?",
+            "¿Está seguro de actualizar este producto? Los cambios no pueden revertirse.",
           ok: {
             push: true,
             color: "positive",
-            label: "Sí, guardar."
+            label: "Sí, actualizar."
           },
           cancel: {
             push: true,
@@ -1338,7 +1330,7 @@ export default {
         })
         .onOk(async () => {
           try {
-            let query = await db.collection("productos").add({
+            let query = await db.collection("productos").doc(this.id).update({
               item: this.item,
               codigo: this.codigo,
               stock: this.stock,
@@ -1347,9 +1339,8 @@ export default {
               unidad: this.unidad,
               minimo: this.minimo
             });
-            // console.log('>>>> OK')
             await this.data.push({
-              id: query.id,
+              // id: query.id,
               item: this.item,
               codigo: this.codigo,
               stock: this.stock,
@@ -1366,8 +1357,9 @@ export default {
               icon: "clear"
             });
           } finally {
-            this.addItem = false;
+            this.updateItem = false;
 
+            this.id = "";
             this.item = "";
             this.codigo = "";
             this.stock = "";
@@ -1377,7 +1369,7 @@ export default {
             this.minimo = "";
 
             this.$q.notify({
-              message: "El producto se ha guardado exitosamente",
+              message: "El producto se ha actualizado exitosamente",
               color: "positive",
               textColor: "white",
               type: "positive",
