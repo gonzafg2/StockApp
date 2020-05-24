@@ -1,8 +1,8 @@
 {
-  "name": "yt-todo",
-  "version": "0.0.1",
-  "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "name": "storeapp",
+  "version": "1.0.1",
+  "description": "Una app para gestionar inventario",
+  "productName": "Store App",
   "cordovaId": "org.cordova.quasar.app",
   "capacitorId": "",
   "author": "Gonzalo Fleming <gonzafg2@gmail.com>",
