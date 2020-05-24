@@ -221,66 +221,6 @@
         </q-btn>
       </template>
 
-      <!-- TODO: Edición en línea en tabla -->
-      <!-- Sección para editar en línea -->
-      <!-- <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td key="desc" :props="props">
-            {{ props.row.name }}
-            <q-popup-edit v-model="props.row.name">
-              <q-input v-model="props.row.name" dense autofocus counter />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="calories" :props="props">
-            {{ props.row.calories }}
-            <q-popup-edit
-              v-model="props.row.calories"
-              title="Update calories"
-              buttons
-            >
-              <q-input
-                type="number"
-                v-model="props.row.calories"
-                dense
-                autofocus
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="fat" :props="props">
-            <div class="text-pre-wrap">{{ props.row.fat }}</div>
-            <q-popup-edit v-model="props.row.fat">
-              <q-input
-                type="textarea"
-                v-model="props.row.fat"
-                dense
-                autofocus
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="carbs" :props="props">
-            {{ props.row.carbs }}
-            <q-popup-edit
-              v-model="props.row.carbs"
-              title="Update carbs"
-              buttons
-              persistent
-            >
-              <q-input
-                type="number"
-                v-model="props.row.carbs"
-                dense
-                autofocus
-                hint="Use buttons to close"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="protein" :props="props">{{ props.row.protein }}</q-td>
-          <q-td key="sodium" :props="props">{{ props.row.sodium }}</q-td>
-          <q-td key="calcium" :props="props">{{ props.row.calcium }}</q-td>
-          <q-td key="iron" :props="props">{{ props.row.iron }}</q-td>
-        </q-tr>
-      </template> -->
-
       <!-- Btnes para Acciones (Update & Delete) sobre un Item (fila) individual -->
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
@@ -992,6 +932,10 @@ let stringOptions = [];
 
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
+const diaNombres = ["Dom", "Lun", "Mar", "Mie", "Jue","Vie","Sab"]
+const diaCeros = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09"]
+const MesLargo = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
+
 export default {
   data() {
     return {
@@ -1408,6 +1352,7 @@ export default {
             ? QSpinnerFacebook // Non-UMD, imported above
             : Quasar.components.QSpinnerFacebook; // eslint-disable-line
         /* End of Codepen workaround */
+        
 
         this.$q.loading.show({
           spinner,
@@ -1421,13 +1366,24 @@ export default {
         const query = await db.collection("productos").get();
 
         await query.forEach(elemento => {
+
+          let unidad = elemento.data().unidad;
+          let lugar = elemento.data().lugar;
+
+          if (unidad == "") {
+              unidad = "-"
+            }
+          if (lugar == "") {
+              lugar = "-"
+            }
+
           let producto = {
             id: elemento.id,
             item: elemento.data().item,
             stock: elemento.data().stock,
             codigo: elemento.data().codigo,
-            unidad: elemento.data().unidad,
-            lugar: elemento.data().lugar,
+            unidad: unidad,
+            lugar: lugar,
             tipo: elemento.data().tipo,
             minimo: elemento.data().minimo
           };
@@ -1466,10 +1422,6 @@ export default {
         const queryOut = await db.collection("salidas").get();
 
         let preDataInOut = [];
-
-        const diaNombres = ["Dom", "Lun", "Mar", "Mie", "Jue","Vie","Sab"]
-        const diaCeros = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09"]
-        const MesLargo = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 
         const getCodigo = await db.collection("productos").get();
 
@@ -1833,7 +1785,6 @@ export default {
               unidad: this.unidad,
               minimo: this.minimo
             });
-            // console.log('>>>> OK')
             await this.data.push({
               id: query.id,
               item: this.item,
@@ -1910,7 +1861,9 @@ export default {
               let producto = {
                 id: elemento.id,
                 item: elemento.data().item,
-                stock: elemento.data().stock
+                stock: elemento.data().stock,
+                codigo: elemento.data().codigo,
+                unidad: elemento.data().unidad
               };
               productoTable.push(producto);
             });
@@ -1933,6 +1886,76 @@ export default {
               .update({
                 stock: stockSuma
               });
+
+            // Actualizar Suma en Tabla Inventario
+
+
+
+            // Actualizar en LocalStorage Tabla Movimientos
+            // let dateMiliSeconds = ids.data().fecha.seconds * 1000
+            
+            // Tomar como argumento dato anterior para Clase Date
+            // let dateJSON = new Date(dateMiliSeconds);
+            let dateJSON = new Date();
+            
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()]
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`
+              }}
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()]
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear()
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
+
+
+            // Arreglo con objeto que tenga el mismo Item
+            // let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+
+            // Obtener Código de Item Seleccionado
+            let codigoItem = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let unidadItem = filArray[0].unidad;
+
+
+            let factura = this.inputFactura;
+            let guia = this.inputGuia;
+            let observaciones = this.inputObs;
+
+            if (factura == "") {
+              factura = "-"
+            }
+            if (guia == "") {
+              guia = "-"
+            }
+            if (observaciones == "") {
+              observaciones = "-"
+            }
+            await this.inout.push({
+              mes: mesLargo,
+              fecha: fechaReal,
+              codigo: codigoItem,
+              item: this.item,
+              unidad: unidadItem,
+              entrada: this.inputCantidad,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              salida: "-",
+              entregado_a: "-",
+              hoja_registro: "-",
+            });
+
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
