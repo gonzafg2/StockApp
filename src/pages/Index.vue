@@ -82,6 +82,7 @@
       class="fit"
       row-key="item"
       rows-per-page-label="Ítems por página"
+      no-data-label="Sin información disponible"
       no-results-label="No se encontraron resultados..."
       :rows-per-page-options="[10]"
       selection="multiple"
@@ -91,7 +92,8 @@
       <template v-slot:top>
         <!-- Ícono lateral izquierdo de la tabla de productos -->
         <q-icon
-          style="font-size: 2.5rem; color: #21BA45"
+          style="font-size: 2.5rem"
+          color="positive"
           name="assignment_turned_in"
         />
 
@@ -335,7 +337,7 @@
       :data="inout"
       :columns="columnsInOut"
       :loading="loading"
-      :filter="filter"
+      :filter="filterInOut"
       :pagination.sync="pagination"
       :pagination-label="getPaginationLabel"
       :visible-columns="visibleColumnsInOut"
@@ -343,26 +345,85 @@
       class="fit"
       row-key="item"
       rows-per-page-label="Ítems por página"
+      no-data-label="Sin información disponible"
       no-results-label="No se encontraron resultados..."
       :rows-per-page-options="[10]"
-      selection="multiple"
       binary-state-sort
     >
       <!-- Contenedor de la parte superior de la tabla -->
       <template v-slot:top>
         <!-- Ícono lateral izquierdo de la tabla de productos -->
         <q-icon
-          style="font-size: 2.5rem; color: #21BA45"
-          name="assignment_turned_in"
+          style="font-size: 2.5rem"
+          color="primary"
+          name="assignment"
         />
-        <q-space />
+
+        <!-- Contenedor de Toggle para mostrar u ocultar columnas -->
+        <div v-if="$q.screen.gt.xs" class="col flex flex-center">
+          
+          <!-- Toggle de Columna de Item -->
+          <q-toggle
+            class="q-px-sm"
+            v-model="visibleColumnsInOut"
+            val="item"
+            label="Item"
+          />
+
+          <!-- Toggle de Columna de Unidad -->
+          <q-toggle
+            class="q-px-sm"
+            v-model="visibleColumnsInOut"
+            val="unidad"
+            label="Unidad"
+          />
+          
+          <!-- Toggle de Columna de Entregado a -->
+          <q-toggle
+            class="q-px-sm"
+            v-model="visibleColumnsInOut"
+            val="entregado_a"
+            label="Entregado"
+          />
+          <!-- Toggle de Columna de Observaciones -->
+          <q-toggle
+            class="q-px-sm"
+            v-model="visibleColumnsInOut"
+            val="observacion"
+            label="Obs."
+          />
+          <!-- Toggle de Columna de Hoja de Registro -->
+          <q-toggle
+            class="q-px-sm"
+            v-model="visibleColumnsInOut"
+            val="hoja_registro"
+            label="Nº Hoja"
+          />
+        </div>
+
+        <!-- ComboBox (Select) de columnas en versión móvil o en anchos pequeños de pantalla -->
+        <q-select
+          v-else
+          v-model="visibleColumnsInOut"
+          multiple
+          borderless
+          dense
+          options-dense
+          :display-value="$q.lang.table.columns"
+          emit-value
+          map-options
+          :options="columnsInOut"
+          option-value="name"
+          style="min-width: 150px"
+        />
+
         <!-- Campo de búsqueda -->
         <q-input
           dense
           debounce="300"
           class="q-pr-md"
           color="primary"
-          v-model="filter"
+          v-model="filterInOut"
           placeholder="Buscar..."
         >
           <!-- Icono de campo de búsqueda -->
@@ -966,16 +1027,20 @@ export default {
         "stock",
         "action"
       ],
-      // Columnas Visibles en Tabla de Inventario
+      // Columnas Visibles en Tabla de Movimientos
       visibleColumnsInOut: [
-        "item",
+        // "item",
         "codigo",
-        "lugar",
-        "tipo",
-        "unidad",
-        "minimo",
-        "stock",
-        "action"
+        "factura",
+        // "unidad",
+        "guia",
+        // "observacion",
+        // "entregado_a",
+        // "hoja_registro",
+        "fecha",
+        "mes",
+        "entrada",
+        "salida"
       ],
       // Datos para Formulario de Agregar Produto
       id: "",
@@ -1011,22 +1076,26 @@ export default {
 
       // Datos para Columnas de Tabla de Movimientos
       columnsInOut: [
+        { name: "mes", label: "Mes", field: "mes", sortable: true, align: "center" },
         {
           name: "fecha",
           required: true,
           label: "Fecha",
+          align: "center",
           field: row => row.fecha,
           format: val => `${val}`,
           sortable: true
         },
-        { name: "id_inout", label: "ID", field: "id", sortable: true },
-        { name: "codigo", align: "center", label: "Código", field: "codigo", sortable: true },
-        { name: "entrada", label: "Entrada", field: "entrada", sortable: true },
+        { name: "id_inout", label: "ID", field: "id", sortable: true, align: "center" },
+        { name: "codigo", label: "Código", field: "codigo", sortable: true, align: "center" },
+        { name: "item", label: "Item", field: "item", sortable: true, align: "center" },
+        { name: "unidad", label: "Unidad", field: "unidad", sortable: true, align: "center" },
+        { name: "entrada", label: "Entrada", field: "entrada", sortable: true, align: "center" },
         { name: "salida", label: "Salida", field: "salida", sortable: true, align: "center" },
         { name: "factura", label: "Factura", field: "factura", sortable: true, align: "center" },
         { name: "guia", label: "Guía", field: "guia", sortable: true, align: "center" },
         { name: "entregado_a", label: "Entregado a:", field: "entregado_a", sortable: true, align: "center" },
-        { name: "observaciones", label: "Observaciones", field: "observaciones", align: "center" },
+        { name: "observacion", label: "Observación", field: "observacion", align: "center" },
         { name: "hoja_registro", label: "Hoja de Registro", field: "hoja_registro", sortable: true, align: "center" },
       ],
 
@@ -1069,8 +1138,11 @@ export default {
         { name: "action", label: "Acciones", field: "action", align: "center" }
       ],
 
-      // Array vacío para función de Filtro en Select de Ítem en Formulario
+      // Array vacío para Filtro en Tabla de Inventario
       filter: "",
+
+      // Array vacío para Filtro en Tabla de Movimientos
+      filterInOut: "",
 
       // Número de filas a mostrar en tabla inventario.
       pagination: {
@@ -1086,7 +1158,7 @@ export default {
   },
   created() {
     this.listarInventario();
-    // this.addItemSelect();
+    this.listarInOut();
   },
   updated() {
     this.btnErase();
@@ -1329,7 +1401,6 @@ export default {
     },
 
     // Traer datos de Firebase a tabla de existencias.
-    // async listarInOut() {
     async listarInventario() {
       try {
         const spinner =
@@ -1371,6 +1442,123 @@ export default {
           let das = e.item;
           this.stringOptions.push(das);
         });
+      }
+    },
+
+    // Traer datos a Tabla de Movimientos
+    async listarInOut() {
+      try {
+        const spinner =
+          typeof QSpinnerFacebook !== "undefined"
+            ? QSpinnerFacebook // Non-UMD, imported above
+            : Quasar.components.QSpinnerFacebook; // eslint-disable-line
+
+        this.$q.loading.show({
+          spinner,
+          spinnerColor: "indigo",
+          spinnerSize: 140,
+          backgroundColor: "indigo",
+          message: "Por favor espere. Se están cargando sus datos...",
+          messageColor: "white"
+        });
+
+        const queryIn = await db.collection("entradas").get();
+        const queryOut = await db.collection("salidas").get();
+
+        let preDataInOut = [];
+
+        const diaNombres = ["Dom", "Lun", "Mar", "Mie", "Jue","Vie","Sab"]
+        const diaCeros = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09"]
+        const MesLargo = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
+
+        queryIn.forEach(ids => {
+            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
+            let dateMiliSeconds = ids.data().fecha.seconds * 1000
+            
+            // Tomar como argumento dato anterior para Clase Date
+            let dateJSON = new Date(dateMiliSeconds);
+            
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()]
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`
+              }
+            }
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()]
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear()
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
+            
+            let entradas = {
+              mes: mesLargo,
+              fecha: fechaReal,
+              item: ids.data().item,
+              entrada: ids.data().cantidad,
+              factura: ids.data().factura,
+              guia: ids.data().guia,
+              observacion: ids.data().observacion,
+            }
+            this.inout.push(entradas)
+          }
+        );
+
+        queryOut.forEach(ids => {
+            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
+            let dateMiliSeconds = ids.data().fecha.seconds * 1000
+            
+            // Tomar como argumento dato anterior para Clase Date
+            let dateJSON = new Date(dateMiliSeconds);
+            
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()]
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`
+              }
+            }
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()]
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear()
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
+
+            let salidas = {
+              mes: mesLargo,
+              fecha: fechaReal,
+              item: ids.data().item,
+              salida: ids.data().cantidad,
+              factura: ids.data().factura,
+              guia: ids.data().guia,
+              observacion: ids.data().observacion,
+              entregado_a: ids.data().entregado_a,
+              hoja_registro: ids.data().hoja_registro,
+            }
+            this.inout.push(salidas)
+          },
+        );
+
+        // console.log(this.inout);
+        
+      } catch (error) {
+        console.log(error);
+      } finally{
+        this.$q.loading.hide();
       }
     },
 
