@@ -1471,6 +1471,19 @@ export default {
         const diaCeros = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09"]
         const MesLargo = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 
+        const getCodigo = await db.collection("productos").get();
+
+        let productoTable = [];
+
+        await getCodigo.forEach(elemento => {
+          let producto = {
+            item: elemento.data().item,
+            codigo: elemento.data().codigo,
+            unidad: elemento.data().unidad,
+          };
+          productoTable.push(producto);
+        });
+
         queryIn.forEach(ids => {
             // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
             let dateMiliSeconds = ids.data().fecha.seconds * 1000
@@ -1485,8 +1498,7 @@ export default {
             for (let i = 1; i < 10; i++) {
               if (diaNum === i) {
                 diaConCeros = `0${i}`
-              }
-            }
+              }}
 
             // Mes: Nombre y Número
             let mesLargo = MesLargo[dateJSON.getMonth()]
@@ -1497,15 +1509,46 @@ export default {
 
             // Fecha a mostrar en Tabla Movimientos
             let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
-            
+
+
+            // Arreglo con objeto que tenga el mismo Item
+            let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+
+            // Obtener Código de Item Seleccionado
+            let codigoItem = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let unidadItem = filArray[0].unidad;
+
+
+            let factura = ids.data().factura;
+            let guia = ids.data().guia;
+            let observaciones = ids.data().observacion;
+
+            if (factura == "") {
+              factura = "-"
+            }
+            if (guia == "") {
+              guia = "-"
+            }
+            if (observaciones == "") {
+              observaciones = "-"
+            }
+
+
             let entradas = {
               mes: mesLargo,
               fecha: fechaReal,
+              codigo: codigoItem,
               item: ids.data().item,
+              unidad: unidadItem,
               entrada: ids.data().cantidad,
-              factura: ids.data().factura,
-              guia: ids.data().guia,
-              observacion: ids.data().observacion,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              salida: "-",
+              entregado_a: "-",
+              hoja_registro: "-",
             }
             this.inout.push(entradas)
           }
@@ -1523,9 +1566,7 @@ export default {
             let diaNum = dateJSON.getDate();
             let diaConCeros = diaNum;
             for (let i = 1; i < 10; i++) {
-              if (diaNum === i) {
-                diaConCeros = `0${i}`
-              }
+              if (diaNum === i) { diaConCeros = `0${i}` }
             }
 
             // Mes: Nombre y Número
@@ -1538,16 +1579,52 @@ export default {
             // Fecha a mostrar en Tabla Movimientos
             let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
 
+
+            // Arreglo con objeto que tenga el mismo Item
+            let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+
+            // Obtener Código de Item Seleccionado
+            let codigoItem = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let unidadItem = filArray[0].unidad;
+
+
+            let factura = ids.data().factura;
+            let guia = ids.data().guia;
+            let entregado = ids.data().entregado_a;
+            let observaciones = ids.data().observacion;
+            let hoja_registro = ids.data().hoja_registro;
+
+            if (factura == "") {
+              factura = "-"
+            }
+            if (guia == "") {
+              guia = "-"
+            }
+            if (entregado == "") {
+              entregado = "Sin información"
+            }
+            if (observaciones == "") {
+              observaciones = "-"
+            }
+            if (hoja_registro == "") {
+              hoja_registro = "-"
+            }
+
             let salidas = {
               mes: mesLargo,
               fecha: fechaReal,
+              unidad: unidadItem,
+              codigo: codigoItem,
               item: ids.data().item,
               salida: ids.data().cantidad,
-              factura: ids.data().factura,
-              guia: ids.data().guia,
-              observacion: ids.data().observacion,
-              entregado_a: ids.data().entregado_a,
-              hoja_registro: ids.data().hoja_registro,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              entregado_a: entregado,
+              hoja_registro: hoja_registro,
+              entrada: "-"
             }
             this.inout.push(salidas)
           },
