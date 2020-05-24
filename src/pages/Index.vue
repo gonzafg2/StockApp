@@ -1,13 +1,13 @@
 <template>
-  <div class="containerIndex q-px-xl q-mx-xl">
+  <div class="q-px-xl q-mx-xl">
     <!-- Título de página -->
-    <h4 class="flex flex-center q-pb-none q-mb-lg">Stock de Productos</h4>
+    <h5 class="flex flex-center q-pb-none q-mb-lg">Inventario de Productos</h5>
 
     <!-- Contenedor para btns de formularios de ingreso -->
     <div class="flex flex-center q-px-md q-mb-lg q-gutter-lg">
       <!-- Btn para desplegar formulario de ingreso de producto. -->
       <q-btn
-        class="q-pa-sm q-mx-md btn__lspace"
+        class="q-pa-xs q-mx-md btn__lspace"
         unelevated
         rounded
         color="positive"
@@ -27,7 +27,7 @@
       </q-btn>
       <!-- Btn para desplegar formulario de entrada de producto. -->
       <q-btn
-        class="q-pa-sm q-mx-md btn__lspace"
+        class="q-pa-xs q-mx-md btn__lspace"
         unelevated
         rounded
         color="primary"
@@ -47,7 +47,7 @@
       </q-btn>
       <!-- Btn para desplegar formulario de salida de producto. -->
       <q-btn
-        class="q-pa-sm q-mx-md btn__lspace"
+        class="q-pa-xs q-mx-md btn__lspace"
         unelevated
         rounded
         color="secondary"
@@ -79,7 +79,7 @@
       :selected.sync="selected"
       :selected-rows-label="getSelectedString"
       color="primary"
-      class="fit"
+      class="fit q-mx-lg"
       row-key="item"
       rows-per-page-label="Ítems por página"
       no-data-label="Sin información disponible"
@@ -272,6 +272,8 @@
       </template>
     </q-table>
 
+    <h5 class="flex flex-center q-pb-none q-mb-lg">Listado de Movimientos de Stock</h5>
+
     <!-- Tabla de Movimientos de Productos -->
     <q-table
       :data="inout"
@@ -282,8 +284,8 @@
       :pagination-label="getPaginationLabel"
       :visible-columns="visibleColumnsInOut"
       color="primary"
-      class="fit"
-      row-key="item"
+      class="fit q-mt-lg"
+      row-key="id"
       rows-per-page-label="Ítems por página"
       no-data-label="Sin información disponible"
       no-results-label="No se encontraron resultados..."
@@ -379,7 +381,7 @@
           icon-right="cloud_download"
           label=""
           no-caps
-          @click="exportTable"
+          @click="exportTableInOut"
         >
           <!-- Tooltip para mejor indicación al usuario -->
           <q-tooltip
@@ -973,7 +975,7 @@ export default {
       ],
       // Columnas Visibles en Tabla de Movimientos
       visibleColumnsInOut: [
-        // "item",
+        "item",
         "codigo",
         "factura",
         // "unidad",
@@ -1020,7 +1022,7 @@ export default {
 
       // Datos para Columnas de Tabla de Movimientos
       columnsInOut: [
-        { name: "mes", label: "Mes", field: "mes", sortable: true, align: "center" },
+        { name: "mes", label: "Mes", field: "mes", sortable: true },
         {
           name: "fecha",
           required: true,
@@ -1030,7 +1032,7 @@ export default {
           format: val => `${val}`,
           sortable: true
         },
-        { name: "id_inout", label: "ID", field: "id", sortable: true, align: "center" },
+        { name: "id_inout", label: "ID", field: "id_inout", sortable: true },
         { name: "codigo", label: "Código", field: "codigo", sortable: true, align: "center" },
         { name: "item", label: "Item", field: "item", sortable: true, align: "center" },
         { name: "unidad", label: "Unidad", field: "unidad", sortable: true, align: "center" },
@@ -1121,6 +1123,42 @@ export default {
           v => v.toLowerCase().indexOf(needle) > -1
         );
       });
+    },
+
+    // Script para exportar Tabla Movimientos de Productos a archvio CSV
+    exportTableInOut() {
+      // naive encoding to csv format
+      const content = [this.columnsInOut.map(col => wrapCsvValue(col.label))]
+        .concat(
+          this.inout.map(row =>
+            this.columnsInOut
+              .map(col =>
+                wrapCsvValue(
+                  typeof col.field === "function"
+                    ? col.field(row)
+                    : row[col.field === void 0 ? col.name : col.field],
+                  col.format
+                )
+              )
+              .join(",")
+          )
+        )
+        .join("\r\n");
+
+      const status = exportFile(
+        // 'table-export.csv',
+        `${dateActual}_Movimientos.xlsx`,
+        content,
+        "text/csv"
+      );
+
+      if (status !== true) {
+        this.$q.notify({
+          message: "Su navegador denegó la descarga del archivo...",
+          color: "negative",
+          icon: "warning"
+        });
+      }
     },
 
     // Script para exportar tabla de ítems a archvio CSV
@@ -1420,10 +1458,8 @@ export default {
 
         const queryIn = await db.collection("entradas").get();
         const queryOut = await db.collection("salidas").get();
-
-        let preDataInOut = [];
-
         const getCodigo = await db.collection("productos").get();
+        console.log(queryIn)
 
         let productoTable = [];
 
@@ -1464,13 +1500,14 @@ export default {
 
 
             // Arreglo con objeto que tenga el mismo Item
-            let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+            let ArrFiltro = productoTable.filter(fil => fil.item == ids.data().item);
+            console.log(ids.data().item)
 
             // Obtener Código de Item Seleccionado
-            let codigoItem = filArray[0].codigo;
+            let codigoItem = ArrFiltro[0].codigo;
 
             // Obtener Unidad de Item Seleccionado
-            let unidadItem = filArray[0].unidad;
+            let unidadItem = ArrFiltro[0].unidad;
 
 
             let factura = ids.data().factura;
@@ -1489,6 +1526,7 @@ export default {
 
 
             let entradas = {
+              id_inout: ids.id,
               mes: mesLargo,
               fecha: fechaReal,
               codigo: codigoItem,
@@ -1565,6 +1603,7 @@ export default {
             }
 
             let salidas = {
+              id_inout: ids.id,
               mes: mesLargo,
               fecha: fechaReal,
               unidad: unidadItem,
