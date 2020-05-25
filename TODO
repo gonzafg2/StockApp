@@ -3,6 +3,8 @@ Todo:
   ☐ Disminuir las peticiones que hacen a la DDBB.
   ☐ Hacer una petición inicial al cargar la página y guardar la DDBB en el array data.
   ☐ Cambiar las peticiones a la DDBB (Petición GET a: "Productos", "Entradas", "Salidas") al array data.
+  ☐ Si presiono editar item, los datos se mantienen para el formulario de creación de item.
+  ☐ Obtener los id y objetos de cada fila en las tablas.
 
 Index.vue:
   ☐ 1. Método: listarInventario()

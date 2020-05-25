@@ -1666,7 +1666,7 @@ export default {
         // Obtener el objeto de la fila completa de tabla y guardarlo en idF.
         let idF = index.id;
 
-        //
+        // Obtener id de la fila para este item específico.
         this.idRowTable = this.data.indexOf(index);
 
         // Obtener los datos de Firebase para mostrar en formulario.
@@ -1675,9 +1675,12 @@ export default {
           .doc(idF)
           .get();
 
+        // Obtener los datos de la Tabla de Inventario.
+        console.log(index.item);
+
         // Mostrar los datos obtenidos en formulario.
-        (this.id = queryGet.id),
-          (this.item = queryGet.data().item),
+        // (this.id = queryGet.id),
+        (this.item = queryGet.data().item),
           (this.stock = queryGet.data().stock),
           (this.codigo = queryGet.data().codigo),
           (this.unidad = queryGet.data().unidad),
@@ -1691,6 +1694,7 @@ export default {
           textColor: "white",
           icon: "clear"
         });
+      } finally {
       }
     },
 
@@ -1861,24 +1865,30 @@ export default {
         .onOk(async () => {
           try {
             // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
-            this.itemLoad = this.item.toUpperCase().trim();
+            this.itemLoad = this.item
+              .toUpperCase()
+              .trim()
+              .replace(/\s+/g, " ");
 
             // Normalizo para Capitalizar dato.
-            this.lugarLoad =
+            let lugarLoadPre =
               this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
-            this.tipoLoad =
+            this.lugarLoad = lugarLoadPre.replace(/\s+/g, " ");
+            let tipoLoadPre =
               this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
-            this.unidadLoad =
+            this.tipoLoad = tipoLoadPre.replace(/\s+/g, " ");
+            let unidadLoadPre =
               this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
+            this.unidadLoad = unidadLoadPre.replace(/\s+/g, " ");
 
             let query = await db
               .collection("productos")
               .doc(this.id)
               .update({
                 // id: this.id,
-                item: this.itemLoad,
-                codigo: this.codigo,
-                stock: this.stock,
+                // item: this.itemLoad,
+                // codigo: this.codigo,
+                // stock: this.stock,
                 lugar: this.lugarLoad,
                 tipo: this.tipoLoad,
                 unidad: this.unidadLoad,
@@ -1949,15 +1959,26 @@ export default {
         .onOk(async () => {
           try {
             // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
-            this.itemLoad = this.item.toUpperCase().trim();
+            this.itemLoad = this.item
+              .toUpperCase()
+              .trim()
+              .replace(/\s+/g, " ");
+
+            // Si stock mínimo está vacío, dejarlo como cero.
+            if (this.minimo === "") {
+              this.minimo = 0;
+            }
 
             // Normalizo para Capitalizar dato.
-            this.lugarLoad =
+            let lugarLoadPre =
               this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
-            this.tipoLoad =
+            this.lugarLoad = lugarLoadPre.replace(/\s+/g, " ");
+            let tipoLoadPre =
               this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
-            this.unidadLoad =
+            this.tipoLoad = tipoLoadPre.replace(/\s+/g, " ");
+            let unidadLoadPre =
               this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
+            this.unidadLoad = unidadLoadPre.replace(/\s+/g, " ");
 
             let query = await db.collection("productos").add({
               item: this.itemLoad,
