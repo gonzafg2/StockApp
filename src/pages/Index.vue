@@ -563,7 +563,7 @@
                 class="col-5"
                 type="number"
                 min="0"
-                v-model.number="codigo"
+                v-model.number="codigoUpdate"
                 hint="Sólo lectura"
                 readonly
                 disable
@@ -574,16 +574,17 @@
               <q-input
                 label="Stock Mínimo"
                 class="col-5"
-                v-model.number="minimo"
+                v-model.number="minimoUpdate"
                 type="number"
                 min="0"
                 :loading="loadingState"
+                hint="Cantidad Mínima"
               />
 
               <q-input
                 label="Item"
                 class="col-12"
-                v-model="item"
+                v-model="itemUpdate"
                 autogrow
                 hint="Sólo lectura"
                 readonly
@@ -593,7 +594,7 @@
               <q-input
                 label="Stock"
                 class="col-5"
-                v-model.number="stock"
+                v-model.number="stockUpdate"
                 type="number"
                 min="0"
                 hint="Sólo lectura"
@@ -606,7 +607,7 @@
               <q-input
                 label="Unidad"
                 class="col-5"
-                v-model="unidad"
+                v-model="unidadUpdate"
                 clearable
                 :loading="loadingState"
                 lazy-rules
@@ -616,7 +617,7 @@
               <q-input
                 label="Tipo"
                 class="col-12"
-                v-model="tipo"
+                v-model="tipoUpdate"
                 clearable
                 :loading="loadingState"
                 lazy-rules
@@ -626,7 +627,7 @@
               <q-input
                 label="Lugar"
                 class="col-12"
-                v-model="lugar"
+                v-model="lugarUpdate"
                 clearable
                 :loading="loadingState"
               />
@@ -1041,6 +1042,19 @@ export default {
       unidad: "",
       unidadLoad: "",
 
+      // Datos para Formulario de Actualizar Producto
+      idUpdate: "",
+      itemUpdate: "",
+      stockUpdate: "",
+      codigoUpdate: "",
+      minimoUpdate: "",
+      lugarUpdate: "",
+      lugarUpdateLoad: "",
+      tipoUpdate: "",
+      tipoUpdateLoad: "",
+      unidadUpdate: "",
+      unidadUpdateLoad: "",
+
       // Datos para Tabla Movimientos
       id_inout: "",
 
@@ -1051,7 +1065,7 @@ export default {
       inputGuia: "",
       inputObs: "",
 
-      // Datos para Formulario de Agregar Entrada
+      // Datos para Formulario de Agregar Salida
       outputItem: "",
       outputCantidad: "",
       outputEntregado: "",
@@ -1477,6 +1491,217 @@ export default {
       }
     },
 
+    // Actualización de productos de forma individual en tabla de existencias.
+    async updateval(index) {
+      try {
+        // Abrir Modal de Update de Ítem
+        this.updateItem = true;
+
+        // Obtener el objeto de la fila completa de tabla y guardarlo en idF.
+        this.idUpdate = index.id;
+
+        // Obtener id de la fila para este item específico.
+        this.idRowTable = this.data.indexOf(index);
+
+        // Mostrar los datos obtenidos en formulario.
+        (this.itemUpdate = index.item),
+          (this.stockUpdate = index.stock),
+          (this.codigoUpdate = index.codigo),
+          (this.unidadUpdate = index.unidad),
+          (this.lugarUpdate = index.lugar),
+          (this.tipoUpdate = index.tipo),
+          (this.minimoUpdate = index.minimo);
+      } catch (error) {
+        this.$q.notify({
+          message: `Ha ocurrido un problema. El error es: ${error}`,
+          color: "red",
+          textColor: "white",
+          icon: "clear"
+        });
+      } finally {
+      }
+    },
+
+    // Actualizar Item (btn edit)
+    updateFormItem() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message:
+            "¿Está seguro de actualizar este producto? Los cambios no pueden revertirse.",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, actualizar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            // Normalizo para Capitalizar dato.
+            let lugarUpdateLoadPre =
+              this.lugarUpdate.charAt(0).toUpperCase() +
+              this.lugarUpdate.slice(1);
+            this.lugarUpdateLoad = lugarUpdateLoadPre.replace(/\s+/g, " ");
+            let tipoUpdateLoadPre =
+              this.tipoUpdate.charAt(0).toUpperCase() +
+              this.tipoUpdate.slice(1);
+            this.tipoUpdateLoad = tipoUpdateLoadPre.replace(/\s+/g, " ");
+            let unidadUpdateLoadPre =
+              this.unidadUpdate.charAt(0).toUpperCase() +
+              this.unidadUpdate.slice(1);
+            this.unidadUpdateLoad = unidadUpdateLoadPre.replace(/\s+/g, " ");
+
+            // Actualizo "lugar", "tipo", "unidad" y "minimo" en Firestore.
+            let query = await db
+              .collection("productos")
+              .doc(this.idUpdate)
+              .update({
+                lugar: this.lugarUpdateLoad,
+                tipo: this.tipoUpdateLoad,
+                unidad: this.unidadUpdateLoad,
+                minimo: this.minimoUpdate
+              });
+            // Actualizar en Tabla Inventario en LocalStorage.
+            this.data[this.idRowTable].lugar = this.lugarUpdateLoad;
+            this.data[this.idRowTable].tipo = this.tipoUpdateLoad;
+            this.data[this.idRowTable].unidad = this.unidadUpdateLoad;
+            this.data[this.idRowTable].minimo = this.minimoUpdate;
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            // Cierro ventana modal de Actualizar Producto.
+            this.updateItem = false;
+
+            // Vuelvo a nulo id de la fila donde está el producto a actualizar.
+            this.idRowTable = null;
+
+            this.idUpdate = "";
+            this.itemUpdate = "";
+            this.codigoUpdate = "";
+            this.stockUpdate = "";
+            this.lugarUpdate = "";
+            this.tipoUpdate = "";
+            this.tipoUpdateLoad = "";
+            this.unidadUpdate = "";
+            this.unidadUpdateLoad = "";
+            this.minimoUpdate = "";
+
+            this.$q.notify({
+              message: "El producto se ha actualizado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
+          }
+        });
+    },
+
+    // Guardar datos (btn) en formulario de CREACION de Producto.
+    saveFormAddItem() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message:
+            "¿Está seguro de guardar este producto dentro de su inventario?",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, guardar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
+            this.itemLoad = this.item
+              .toUpperCase()
+              .trim()
+              .replace(/\s+/g, " ");
+
+            // Si stock mínimo está vacío, dejarlo como cero.
+            if (this.minimo === "") {
+              this.minimo = 0;
+            }
+
+            // Normalizo para Capitalizar dato.
+            let lugarLoadPre =
+              this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
+            this.lugarLoad = lugarLoadPre.replace(/\s+/g, " ");
+            let tipoLoadPre =
+              this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
+            this.tipoLoad = tipoLoadPre.replace(/\s+/g, " ");
+            let unidadLoadPre =
+              this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
+            this.unidadLoad = unidadLoadPre.replace(/\s+/g, " ");
+
+            let query = await db.collection("productos").add({
+              item: this.itemLoad,
+              codigo: this.codigo,
+              stock: this.stock,
+              lugar: this.lugarLoad,
+              tipo: this.tipoLoad,
+              unidad: this.unidadLoad,
+              minimo: this.minimo
+            });
+            await this.data.push({
+              id: query.id,
+              item: this.itemLoad,
+              codigo: this.codigo,
+              stock: this.stock,
+              lugar: this.lugarLoad,
+              tipo: this.tipoLoad,
+              unidad: this.unidadLoad,
+              minimo: this.minimo
+            });
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            this.addItem = false;
+            this.item = "";
+            this.itemLoad = "";
+            this.codigo = "";
+            this.stock = "";
+            this.lugar = "";
+            this.lugarLoad = "";
+            this.tipo = "";
+            this.tipoLoad = "";
+            this.unidad = "";
+            this.unidadLoad = "";
+            this.minimo = "";
+
+            this.$q.notify({
+              message: "El producto se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
+          }
+        });
+    },
+
     // Función para filtrar en Select
     filterFn(val, update, abort) {
       if (val.length < 2) {
@@ -1583,7 +1808,7 @@ export default {
       }
     },
 
-    // Disable a btn de erase in batch
+    // Desactivar btn de eliminar en batch cuando no hay selección.
     btnErase() {
       let btnEraseBatch = document.getElementById("btn-erase-batch");
 
@@ -1655,47 +1880,6 @@ export default {
             this.selected = [];
           }
         });
-    },
-
-    // Actualización de productos de forma individual en tabla de existencias.
-    async updateval(index) {
-      try {
-        // Abrir Modal de Update de Ítem
-        this.updateItem = true;
-
-        // Obtener el objeto de la fila completa de tabla y guardarlo en idF.
-        let idF = index.id;
-
-        // Obtener id de la fila para este item específico.
-        this.idRowTable = this.data.indexOf(index);
-
-        // Obtener los datos de Firebase para mostrar en formulario.
-        const queryGet = await db
-          .collection("productos")
-          .doc(idF)
-          .get();
-
-        // Obtener los datos de la Tabla de Inventario.
-        console.log(index.item);
-
-        // Mostrar los datos obtenidos en formulario.
-        // (this.id = queryGet.id),
-        (this.item = queryGet.data().item),
-          (this.stock = queryGet.data().stock),
-          (this.codigo = queryGet.data().codigo),
-          (this.unidad = queryGet.data().unidad),
-          (this.lugar = queryGet.data().lugar),
-          (this.tipo = queryGet.data().tipo),
-          (this.minimo = queryGet.data().minimo);
-      } catch (error) {
-        this.$q.notify({
-          message: `Ha ocurrido un problema. El error es: ${error}`,
-          color: "red",
-          textColor: "white",
-          icon: "clear"
-        });
-      } finally {
-      }
     },
 
     // Eliminación de productos de forma individual en tabla de existencias.
@@ -1834,194 +2018,6 @@ export default {
             this.$q.notify({
               message:
                 "La importación de productos se ha realizado exitosamente",
-              color: "positive",
-              textColor: "white",
-              type: "positive",
-              position: "top"
-            });
-          }
-        });
-    },
-
-    // Actualizar Item (btn edit)
-    updateFormItem() {
-      this.$q
-        .dialog({
-          title: "Acción Importante: Requiere Confirmación.",
-          message:
-            "¿Está seguro de actualizar este producto? Los cambios no pueden revertirse.",
-          ok: {
-            push: true,
-            color: "positive",
-            label: "Sí, actualizar."
-          },
-          cancel: {
-            push: true,
-            color: "negative",
-            label: "¡No!"
-          },
-          persistent: true
-        })
-        .onOk(async () => {
-          try {
-            // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
-            this.itemLoad = this.item
-              .toUpperCase()
-              .trim()
-              .replace(/\s+/g, " ");
-
-            // Normalizo para Capitalizar dato.
-            let lugarLoadPre =
-              this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
-            this.lugarLoad = lugarLoadPre.replace(/\s+/g, " ");
-            let tipoLoadPre =
-              this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
-            this.tipoLoad = tipoLoadPre.replace(/\s+/g, " ");
-            let unidadLoadPre =
-              this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
-            this.unidadLoad = unidadLoadPre.replace(/\s+/g, " ");
-
-            let query = await db
-              .collection("productos")
-              .doc(this.id)
-              .update({
-                // id: this.id,
-                // item: this.itemLoad,
-                // codigo: this.codigo,
-                // stock: this.stock,
-                lugar: this.lugarLoad,
-                tipo: this.tipoLoad,
-                unidad: this.unidadLoad,
-                minimo: this.minimo
-              });
-            // this.data[this.idRowTable].id = this.id
-            // this.data[this.idRowTable].item = this.item
-            // this.data[this.idRowTable].codigo = this.codigo
-            // this.data[this.idRowTable].stock = this.stock
-            this.data[this.idRowTable].lugar = this.lugarLoad;
-            this.data[this.idRowTable].tipo = this.tipoLoad;
-            this.data[this.idRowTable].unidad = this.unidadLoad;
-            this.data[this.idRowTable].minimo = this.minimo;
-          } catch (error) {
-            this.$q.notify({
-              message: `Ha ocurrido un problema. El error es: ${error}`,
-              color: "red",
-              textColor: "white",
-              icon: "clear"
-            });
-          } finally {
-            // this.reload(true);
-            this.updateItem = false;
-
-            this.id = "";
-            this.item = "";
-            this.itemLoad = "";
-            this.codigo = "";
-            this.stock = "";
-            this.lugar = "";
-            this.lugarLoad = "";
-            this.tipo = "";
-            this.tipoLoad = "";
-            this.unidad = "";
-            this.unidadLoad = "";
-            this.minimo = "";
-
-            this.$q.notify({
-              message: "El producto se ha actualizado exitosamente",
-              color: "positive",
-              textColor: "white",
-              type: "positive",
-              position: "top"
-            });
-          }
-        });
-    },
-
-    // Guardar datos (btn) en formulario de CREACION de Producto.
-    saveFormAddItem() {
-      this.$q
-        .dialog({
-          title: "Acción Importante: Requiere Confirmación.",
-          message:
-            "¿Está seguro de guardar este producto dentro de su inventario?",
-          ok: {
-            push: true,
-            color: "positive",
-            label: "Sí, guardar."
-          },
-          cancel: {
-            push: true,
-            color: "negative",
-            label: "¡No!"
-          },
-          persistent: true
-        })
-        .onOk(async () => {
-          try {
-            // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
-            this.itemLoad = this.item
-              .toUpperCase()
-              .trim()
-              .replace(/\s+/g, " ");
-
-            // Si stock mínimo está vacío, dejarlo como cero.
-            if (this.minimo === "") {
-              this.minimo = 0;
-            }
-
-            // Normalizo para Capitalizar dato.
-            let lugarLoadPre =
-              this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
-            this.lugarLoad = lugarLoadPre.replace(/\s+/g, " ");
-            let tipoLoadPre =
-              this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
-            this.tipoLoad = tipoLoadPre.replace(/\s+/g, " ");
-            let unidadLoadPre =
-              this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
-            this.unidadLoad = unidadLoadPre.replace(/\s+/g, " ");
-
-            let query = await db.collection("productos").add({
-              item: this.itemLoad,
-              codigo: this.codigo,
-              stock: this.stock,
-              lugar: this.lugarLoad,
-              tipo: this.tipoLoad,
-              unidad: this.unidadLoad,
-              minimo: this.minimo
-            });
-            await this.data.push({
-              id: query.id,
-              item: this.itemLoad,
-              codigo: this.codigo,
-              stock: this.stock,
-              lugar: this.lugarLoad,
-              tipo: this.tipoLoad,
-              unidad: this.unidadLoad,
-              minimo: this.minimo
-            });
-          } catch (error) {
-            this.$q.notify({
-              message: `Ha ocurrido un problema. El error es: ${error}`,
-              color: "red",
-              textColor: "white",
-              icon: "clear"
-            });
-          } finally {
-            this.addItem = false;
-            this.item = "";
-            this.itemLoad = "";
-            this.codigo = "";
-            this.stock = "";
-            this.lugar = "";
-            this.lugarLoad = "";
-            this.tipo = "";
-            this.tipoLoad = "";
-            this.unidad = "";
-            this.unidadLoad = "";
-            this.minimo = "";
-
-            this.$q.notify({
-              message: "El producto se ha guardado exitosamente",
               color: "positive",
               textColor: "white",
               type: "positive",
