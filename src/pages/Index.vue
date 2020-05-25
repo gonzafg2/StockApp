@@ -1227,7 +1227,7 @@ export default {
   },
 
   methods: {
-    // Traer datos de Firebase a tabla de existencias.
+    // Traer datos de Firebase a arreglo "data" en Tabla de Productos.
     async listarInventario() {
       try {
         const spinner =
@@ -1301,7 +1301,7 @@ export default {
       }
     },
 
-    // Traer datos a Tabla de Movimientos
+    // Traer datos de Firebase a Tabla de Movimientos.
     async listarInOut() {
       try {
         const spinner =
@@ -1491,7 +1491,7 @@ export default {
       }
     },
 
-    // Actualización de productos de forma individual en tabla de existencias.
+    // Actualización de Producto: Formulario en modal
     async updateval(index) {
       try {
         // Abrir Modal de Update de Ítem
@@ -1522,7 +1522,7 @@ export default {
       }
     },
 
-    // Actualizar Item (btn edit)
+    // Actualización de Porducto: Botón de edición.
     updateFormItem() {
       this.$q
         .dialog({
@@ -1693,6 +1693,173 @@ export default {
 
             this.$q.notify({
               message: "El producto se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
+          }
+        });
+    },
+
+    // Limpiar datos (btn) en formulario de Creación de Producto.
+    cleanFormAddItem() {
+      this.item = "";
+      this.codigo = "";
+      this.stock = "";
+      this.lugar = "";
+      this.tipo = "";
+      this.unidad = "";
+      this.minimo = "";
+    },
+
+    // Guardar datos (btn) en formulario de ENTRADA de Producto.
+    saveAddInput() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message: "¿Está seguro de guardar esta entrada de producto",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, guardar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            // Añade los datos del formulario Entrada de Producto a Firebase.
+            let query = await db.collection("entradas").add({
+              cantidad: this.inputCantidad,
+              factura: this.inputFactura,
+              fecha: timestamp,
+              guia: this.inputGuia,
+              item: this.item,
+              observaciones: this.inputObs
+            });
+
+            let getStock = await db.collection("productos").get();
+
+            let productoTable = [];
+
+            await getStock.forEach(elemento => {
+              let producto = {
+                id: elemento.id,
+                item: elemento.data().item,
+                stock: elemento.data().stock,
+                codigo: elemento.data().codigo,
+                unidad: elemento.data().unidad
+              };
+              productoTable.push(producto);
+            });
+
+            // Buscar Arreglo con objeto que tenga el mismo nombre de Item
+            let filArray = productoTable.filter(fil => fil.item == this.item);
+
+            // Obtener ID de Item Seleccionado
+            let idSelInput = filArray[0].id;
+
+            // Obtener Stock de Item Seleccionado
+            let stockItem = filArray[0].stock;
+
+            let stockSuma = stockItem + this.inputCantidad;
+
+            // Actualizar campo de stock con dato ingresado en formulario
+            let update = db
+              .collection("productos")
+              .doc(idSelInput)
+              .update({
+                stock: stockSuma
+              });
+
+            // Actualizar Suma en Tabla Inventario
+
+            // Actualizar en LocalStorage Tabla Movimientos
+            // let dateMiliSeconds = ids.data().fecha.seconds * 1000
+
+            // Tomar como argumento dato anterior para Clase Date
+            // let dateJSON = new Date(dateMiliSeconds);
+            let dateJSON = new Date();
+
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()];
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`;
+              }
+            }
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()];
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear();
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
+
+            // Arreglo con objeto que tenga el mismo Item
+            // let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+
+            // Obtener Código de Item Seleccionado
+            let codigoItem = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let unidadItem = filArray[0].unidad;
+
+            let factura = this.inputFactura;
+            let guia = this.inputGuia;
+            let observaciones = this.inputObs;
+
+            if (factura == "") {
+              factura = "-";
+            }
+            if (guia == "") {
+              guia = "-";
+            }
+            if (observaciones == "") {
+              observaciones = "-";
+            }
+            await this.inout.push({
+              mes: mesLargo,
+              fecha: fechaReal,
+              codigo: codigoItem,
+              item: this.item,
+              unidad: unidadItem,
+              entrada: this.inputCantidad,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              salida: "-",
+              entregado_a: "-",
+              hoja_registro: "-"
+            });
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            this.addInput = false;
+
+            this.item = "";
+            this.inputCantidad = "";
+            this.inputFactura = "";
+            this.inputGuia = "";
+            this.inputObs = "";
+
+            this.$q.notify({
+              message: "La entrada se ha guardado exitosamente",
               color: "positive",
               textColor: "white",
               type: "positive",
@@ -1936,17 +2103,6 @@ export default {
         });
     },
 
-    // Limpiar datos (btn) en formulario de Creación de Producto.
-    cleanFormAddItem() {
-      this.item = "";
-      this.codigo = "";
-      this.stock = "";
-      this.lugar = "";
-      this.tipo = "";
-      this.unidad = "";
-      this.minimo = "";
-    },
-
     // Limpiar datos (btn) en formulario de ENTRADA de Producto.
     cleanFormAddInput() {
       (this.item = ""),
@@ -2018,161 +2174,6 @@ export default {
             this.$q.notify({
               message:
                 "La importación de productos se ha realizado exitosamente",
-              color: "positive",
-              textColor: "white",
-              type: "positive",
-              position: "top"
-            });
-          }
-        });
-    },
-
-    // Guardar datos (btn) en formulario de ENTRADA de Producto.
-    saveAddInput() {
-      this.$q
-        .dialog({
-          title: "Acción Importante: Requiere Confirmación.",
-          message: "¿Está seguro de guardar esta entrada de producto",
-          ok: {
-            push: true,
-            color: "positive",
-            label: "Sí, guardar."
-          },
-          cancel: {
-            push: true,
-            color: "negative",
-            label: "¡No!"
-          },
-          persistent: true
-        })
-        .onOk(async () => {
-          try {
-            let query = await db.collection("entradas").add({
-              cantidad: this.inputCantidad,
-              factura: this.inputFactura,
-              fecha: timestamp,
-              guia: this.inputGuia,
-              item: this.item,
-              observacion: this.inputObs
-            });
-
-            let getStock = await db.collection("productos").get();
-
-            let productoTable = [];
-
-            await getStock.forEach(elemento => {
-              let producto = {
-                id: elemento.id,
-                item: elemento.data().item,
-                stock: elemento.data().stock,
-                codigo: elemento.data().codigo,
-                unidad: elemento.data().unidad
-              };
-              productoTable.push(producto);
-            });
-
-            // Buscar Arreglo con objeto que tenga el mismo nombre de Item
-            let filArray = productoTable.filter(fil => fil.item == this.item);
-
-            // Obtener ID de Item Seleccionado
-            let idSelInput = filArray[0].id;
-
-            // Obtener Stock de Item Seleccionado
-            let stockItem = filArray[0].stock;
-
-            let stockSuma = stockItem + this.inputCantidad;
-
-            // Actualizar campo de stock con dato ingresado en formulario
-            let update = db
-              .collection("productos")
-              .doc(idSelInput)
-              .update({
-                stock: stockSuma
-              });
-
-            // Actualizar Suma en Tabla Inventario
-
-            // Actualizar en LocalStorage Tabla Movimientos
-            // let dateMiliSeconds = ids.data().fecha.seconds * 1000
-
-            // Tomar como argumento dato anterior para Clase Date
-            // let dateJSON = new Date(dateMiliSeconds);
-            let dateJSON = new Date();
-
-            // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()];
-            let diaNum = dateJSON.getDate();
-            let diaConCeros = diaNum;
-            for (let i = 1; i < 10; i++) {
-              if (diaNum === i) {
-                diaConCeros = `0${i}`;
-              }
-            }
-
-            // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()];
-            let mesN = dateJSON.getMonth() + 1;
-
-            // Año: Largo y Corto
-            let año = dateJSON.getFullYear();
-
-            // Fecha a mostrar en Tabla Movimientos
-            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
-
-            // Arreglo con objeto que tenga el mismo Item
-            // let filArray = productoTable.filter(fil => fil.item == ids.data().item);
-
-            // Obtener Código de Item Seleccionado
-            let codigoItem = filArray[0].codigo;
-
-            // Obtener Unidad de Item Seleccionado
-            let unidadItem = filArray[0].unidad;
-
-            let factura = this.inputFactura;
-            let guia = this.inputGuia;
-            let observaciones = this.inputObs;
-
-            if (factura == "") {
-              factura = "-";
-            }
-            if (guia == "") {
-              guia = "-";
-            }
-            if (observaciones == "") {
-              observaciones = "-";
-            }
-            await this.inout.push({
-              mes: mesLargo,
-              fecha: fechaReal,
-              codigo: codigoItem,
-              item: this.item,
-              unidad: unidadItem,
-              entrada: this.inputCantidad,
-              factura: factura,
-              guia: guia,
-              observacion: observaciones,
-              salida: "-",
-              entregado_a: "-",
-              hoja_registro: "-"
-            });
-          } catch (error) {
-            this.$q.notify({
-              message: `Ha ocurrido un problema. El error es: ${error}`,
-              color: "red",
-              textColor: "white",
-              icon: "clear"
-            });
-          } finally {
-            this.addInput = false;
-
-            this.item = "";
-            this.inputCantidad = "";
-            this.inputFactura = "";
-            this.inputGuia = "";
-            this.inputObs = "";
-
-            this.$q.notify({
-              message: "La entrada se ha guardado exitosamente",
               color: "positive",
               textColor: "white",
               type: "positive",
