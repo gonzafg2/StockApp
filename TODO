@@ -5,7 +5,7 @@ Todo:
   ☐ Cambiar las peticiones a la DDBB (Petición GET a: "Productos", "Entradas", "Salidas") al array data.
 
 Index.vue:
-  ☐ 1. Método:  
+  ☐ 1. Método: listarInventario()
   ☐ 1. Método:  
   ☐ 1. Método:  
   ☐ 1. Método:  

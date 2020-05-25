@@ -272,7 +272,9 @@
       </template>
     </q-table>
 
-    <h5 class="flex flex-center q-pb-none q-mb-lg">Listado de Movimientos de Stock</h5>
+    <h5 class="flex flex-center q-pb-none q-mb-lg">
+      Listado de Movimientos de Stock
+    </h5>
 
     <!-- Tabla de Movimientos de Productos -->
     <q-table
@@ -295,15 +297,10 @@
       <!-- Contenedor de la parte superior de la tabla -->
       <template v-slot:top>
         <!-- Ícono lateral izquierdo de la tabla de productos -->
-        <q-icon
-          style="font-size: 2.5rem"
-          color="primary"
-          name="assignment"
-        />
+        <q-icon style="font-size: 2.5rem" color="primary" name="assignment" />
 
         <!-- Contenedor de Toggle para mostrar u ocultar columnas -->
         <div v-if="$q.screen.gt.xs" class="col flex flex-center">
-          
           <!-- Toggle de Columna de Item -->
           <q-toggle
             class="q-px-sm"
@@ -319,7 +316,7 @@
             val="unidad"
             label="Unidad"
           />
-          
+
           <!-- Toggle de Columna de Entregado a -->
           <q-toggle
             class="q-px-sm"
@@ -393,14 +390,12 @@
             Toca para exportar a un archivo Excel.
           </q-tooltip>
         </q-btn>
-
       </template>
 
       <!-- Animación para carga procesos en la tabla de inventario -->
       <template v-slot:loading>
         <q-inner-loading showing color="primary" />
       </template>
-
     </q-table>
 
     <!-- Formulario de ingreso de nuevos productos como ventana modal-->
@@ -428,24 +423,31 @@
           <q-form @submit="saveFormAddItem" @reset="cleanFormAddItem">
             <!-- Contenedor interno de formulario -->
             <div class="q-gutter-y-md q-px-lg row" style="max-width: 100%">
+              <!-- Código -->
               <q-input
                 label="Código"
                 class="col-5"
                 type="number"
+                min="0"
                 v-model.number="codigo"
                 :loading="loadingState"
+                hint="ID del producto"
               />
 
               <div class="col-2"></div>
 
+              <!-- Stock Mínimo -->
               <q-input
                 label="Stock Mínimo"
                 class="col-5"
                 v-model.number="minimo"
                 type="number"
+                min="0"
                 :loading="loadingState"
+                hint="Cantidad Mínima"
               />
 
+              <!-- Item -->
               <q-input
                 label="Item"
                 class="col-12"
@@ -457,18 +459,22 @@
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
 
+              <!-- Stock (Cantidad) -->
               <q-input
                 label="Stock"
                 class="col-5"
                 v-model.number="stock"
                 type="number"
+                min="0"
                 :loading="loadingState"
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
+                hint="Cantidad Actual"
               />
 
               <div class="col-2"></div>
 
+              <!-- Unidad -->
               <q-input
                 label="Unidad"
                 class="col-5"
@@ -479,6 +485,7 @@
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
 
+              <!-- Tipo -->
               <q-input
                 label="Tipo"
                 class="col-12"
@@ -489,6 +496,7 @@
                 :rules="[val => !!val || 'Este campo es requerido']"
               />
 
+              <!-- Lugar -->
               <q-input
                 label="Lugar"
                 class="col-12"
@@ -499,6 +507,7 @@
             </div>
             <!-- Contenedor de btns de guardado y limpiado de formulario -->
             <div class="flex flex-center q-pa-md q-gutter-lg">
+              <!-- Submit -->
               <q-btn
                 type="submit"
                 class="q-pa-sm q-mt-xl"
@@ -508,6 +517,7 @@
                 label="Guardar"
                 size="md"
               />
+              <!-- Reset -->
               <q-btn
                 type="reset"
                 class="q-pa-sm q-mt-xl"
@@ -552,6 +562,7 @@
                 label="Código"
                 class="col-5"
                 type="number"
+                min="0"
                 v-model.number="codigo"
                 hint="Sólo lectura"
                 readonly
@@ -565,6 +576,7 @@
                 class="col-5"
                 v-model.number="minimo"
                 type="number"
+                min="0"
                 :loading="loadingState"
               />
 
@@ -583,6 +595,7 @@
                 class="col-5"
                 v-model.number="stock"
                 type="number"
+                min="0"
                 hint="Sólo lectura"
                 readonly
                 disable
@@ -685,33 +698,39 @@
               </q-select>
 
               <q-input
-                class="col-3 q-mt-lg"
+                class="col-3"
                 v-model.number="inputCantidad"
                 type="number"
+                min="1"
                 label="Cantidad"
                 :loading="loadingState"
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
+                hint="Mínimo 1"
               />
 
               <div class="col-1"></div>
 
               <q-input
-                class="col-3 q-mt-none q-pt-xs"
+                class="col-3"
                 v-model.number="inputFactura"
                 type="number"
+                min="1"
                 label="Factura"
                 :loading="loadingState"
+                hint="Nº de Factura"
               />
 
               <div class="col-1"></div>
 
               <q-input
-                class="col-4 q-mt-none q-pt-xs"
+                class="col-4"
                 v-model.number="inputGuia"
                 type="number"
+                min="1"
                 label="Guía de Despacho"
                 :loading="loadingState"
+                hint="Nº de Guía"
               />
 
               <q-input
@@ -799,33 +818,39 @@
               </q-select>
 
               <q-input
-                class="col-3 q-mt-lg"
+                class="col-3"
                 v-model.number="outputCantidad"
                 type="number"
+                min="1"
                 label="Cantidad"
                 :loading="loadingState"
                 lazy-rules
                 :rules="[val => !!val || 'Este campo es requerido']"
+                hint="Mínimo 1"
               />
 
               <div class="col-1"></div>
 
               <q-input
-                class="col-3 q-mt-none q-pt-xs"
+                class="col-3"
                 v-model.number="outputFactura"
                 type="number"
+                min="1"
                 label="Factura"
                 :loading="loadingState"
+                hint="Nº de Factura"
               />
 
               <div class="col-1"></div>
 
               <q-input
-                class="col-4 q-mt-none q-pt-xs"
+                class="col-4"
                 v-model.number="outputGuia"
                 type="number"
+                min="1"
                 label="Guía de Despacho"
                 :loading="loadingState"
+                hint="Nº de Guía"
               />
 
               <q-input
@@ -833,7 +858,7 @@
                 v-model="outputEntregado"
                 label="Entregado a:"
                 :loading="loadingState"
-                hint=""
+                hint="¿Quién recepciona el producto?"
               />
 
               <div class="col-1"></div>
@@ -842,9 +867,10 @@
                 class="col-4"
                 v-model.number="outputHojaRegistro"
                 type="number"
+                min="1"
                 label="Registro"
-                hint="Número de hoja"
                 :loading="loadingState"
+                hint="Número de hoja"
               />
 
               <q-input
@@ -934,9 +960,22 @@ let stringOptions = [];
 
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-const diaNombres = ["Dom", "Lun", "Mar", "Mie", "Jue","Vie","Sab"]
-const diaCeros = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09"]
-const MesLargo = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
+const diaNombres = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+const diaCeros = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09"];
+const MesLargo = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre"
+];
 
 export default {
   data() {
@@ -991,12 +1030,16 @@ export default {
       // Datos para Formulario de Agregar Produto
       id: "",
       item: "",
+      itemLoad: "",
       codigo: "",
       lugar: "",
+      lugarLoad: "",
       tipo: "",
+      tipoLoad: "",
       minimo: "",
       stock: "",
       unidad: "",
+      unidadLoad: "",
 
       // Datos para Tabla Movimientos
       id_inout: "",
@@ -1033,16 +1076,75 @@ export default {
           sortable: true
         },
         { name: "id_inout", label: "ID", field: "id_inout", sortable: true },
-        { name: "codigo", label: "Código", field: "codigo", sortable: true, align: "center" },
-        { name: "item", label: "Item", field: "item", sortable: true, align: "center" },
-        { name: "unidad", label: "Unidad", field: "unidad", sortable: true, align: "center" },
-        { name: "entrada", label: "Entrada", field: "entrada", sortable: true, align: "center" },
-        { name: "salida", label: "Salida", field: "salida", sortable: true, align: "center" },
-        { name: "factura", label: "Factura", field: "factura", sortable: true, align: "center" },
-        { name: "guia", label: "Guía", field: "guia", sortable: true, align: "center" },
-        { name: "entregado_a", label: "Entregado a:", field: "entregado_a", sortable: true, align: "center" },
-        { name: "observacion", label: "Observación", field: "observacion", align: "center" },
-        { name: "hoja_registro", label: "Hoja de Registro", field: "hoja_registro", sortable: true, align: "center" },
+        {
+          name: "codigo",
+          label: "Código",
+          field: "codigo",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "item",
+          label: "Item",
+          field: "item",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "unidad",
+          label: "Unidad",
+          field: "unidad",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "entrada",
+          label: "Entrada",
+          field: "entrada",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "salida",
+          label: "Salida",
+          field: "salida",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "factura",
+          label: "Factura",
+          field: "factura",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "guia",
+          label: "Guía",
+          field: "guia",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "entregado_a",
+          label: "Entregado a:",
+          field: "entregado_a",
+          sortable: true,
+          align: "center"
+        },
+        {
+          name: "observacion",
+          label: "Observación",
+          field: "observacion",
+          align: "center"
+        },
+        {
+          name: "hoja_registro",
+          label: "Hoja de Registro",
+          field: "hoja_registro",
+          sortable: true,
+          align: "center"
+        }
       ],
 
       // Datos para Columnas de Tabla de Inventario
@@ -1099,7 +1201,7 @@ export default {
       data: [],
 
       // Array vacío para traer datos de Tabla Movimientos de Stock
-      inout: [],
+      inout: []
     };
   },
   created() {
@@ -1119,7 +1221,6 @@ export default {
             ? QSpinnerFacebook // Non-UMD, imported above
             : Quasar.components.QSpinnerFacebook; // eslint-disable-line
         /* End of Codepen workaround */
-        
 
         this.$q.loading.show({
           spinner,
@@ -1130,34 +1231,52 @@ export default {
           messageColor: "white"
         });
 
+        // Almaceno BD en constante query.
         const query = await db.collection("productos").get();
 
+        // query es un objeto de más objetos, por lo que hay que transformarlo a un arreglo de objetos.
         await query.forEach(elemento => {
+          // elemento es cada objeto dentro del objeto query recibido
 
+          // Defino variables para normalizar los datos
+          let id = elemento.id;
+          let item = elemento.data().item;
+          let stock = elemento.data().stock;
+          let codigo = elemento.data().codigo;
           let unidad = elemento.data().unidad;
           let lugar = elemento.data().lugar;
+          let tipo = elemento.data().tipo;
+          let minimo = elemento.data().minimo;
 
+          // Si unidad está vacío, poner un guíon (-).
           if (unidad == "") {
-              unidad = "-"
-            }
+            unidad = "-";
+          }
+          // Si lugar está vacío, poner un guíon (-).
           if (lugar == "") {
-              lugar = "-"
-            }
+            lugar = "-";
+          }
 
+          // Defino el objeto producto con los valores a exportar.
           let producto = {
-            id: elemento.id,
-            item: elemento.data().item,
-            stock: elemento.data().stock,
-            codigo: elemento.data().codigo,
+            id: id,
+            item: item,
+            stock: stock,
+            codigo: codigo,
             unidad: unidad,
             lugar: lugar,
-            tipo: elemento.data().tipo,
-            minimo: elemento.data().minimo
+            tipo: tipo,
+            minimo: minimo
           };
+          // Exporto el objeto producto al arreglo creado data.
+          // Se recibe desde Firestore y se almacena en LocalStorage como un arreglo
+          // de objetos.
           this.data.push(producto);
         });
       } catch (error) {
+        // Mostrar error en consola.
         console.log(error);
+        // Mostrar error como notificación.
       } finally {
         this.$q.loading.hide();
 
@@ -1188,7 +1307,7 @@ export default {
         const queryIn = await db.collection("entradas").get();
         const queryOut = await db.collection("salidas").get();
         const getCodigo = await db.collection("productos").get();
-        console.log(queryIn)
+        // console.log(queryIn);
 
         let productoTable = [];
 
@@ -1196,172 +1315,167 @@ export default {
           let producto = {
             item: elemento.data().item,
             codigo: elemento.data().codigo,
-            unidad: elemento.data().unidad,
+            unidad: elemento.data().unidad
           };
           productoTable.push(producto);
         });
 
         queryIn.forEach(ids => {
-            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
-            let dateMiliSeconds = ids.data().fecha.seconds * 1000
-            
-            // Tomar como argumento dato anterior para Clase Date
-            let dateJSON = new Date(dateMiliSeconds);
-            
-            // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()]
-            let diaNum = dateJSON.getDate();
-            let diaConCeros = diaNum;
-            for (let i = 1; i < 10; i++) {
-              if (diaNum === i) {
-                diaConCeros = `0${i}`
-              }}
+          // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
+          let dateMiliSeconds = ids.data().fecha.seconds * 1000;
 
-            // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()]
-            let mesN = dateJSON.getMonth() + 1;
+          // Tomar como argumento dato anterior para Clase Date
+          let dateJSON = new Date(dateMiliSeconds);
 
-            // Año: Largo y Corto
-            let año = dateJSON.getFullYear()
-
-            // Fecha a mostrar en Tabla Movimientos
-            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
-
-
-            // Arreglo con objeto que tenga el mismo Item
-            let ArrFiltro = productoTable.filter(fil => fil.item == ids.data().item);
-            console.log(ids.data().item)
-
-            // Obtener Código de Item Seleccionado
-            let codigoItem = ArrFiltro[0].codigo;
-
-            // Obtener Unidad de Item Seleccionado
-            let unidadItem = ArrFiltro[0].unidad;
-
-
-            let factura = ids.data().factura;
-            let guia = ids.data().guia;
-            let observaciones = ids.data().observacion;
-
-            if (factura == "") {
-              factura = "-"
+          // Día: Nombre y Número
+          let diaNom = diaNombres[dateJSON.getDay()];
+          let diaNum = dateJSON.getDate();
+          let diaConCeros = diaNum;
+          for (let i = 1; i < 10; i++) {
+            if (diaNum === i) {
+              diaConCeros = `0${i}`;
             }
-            if (guia == "") {
-              guia = "-"
-            }
-            if (observaciones == "") {
-              observaciones = "-"
-            }
-
-
-            let entradas = {
-              id_inout: ids.id,
-              mes: mesLargo,
-              fecha: fechaReal,
-              codigo: codigoItem,
-              item: ids.data().item,
-              unidad: unidadItem,
-              entrada: ids.data().cantidad,
-              factura: factura,
-              guia: guia,
-              observacion: observaciones,
-              salida: "-",
-              entregado_a: "-",
-              hoja_registro: "-",
-            }
-            this.inout.push(entradas)
           }
-        );
+
+          // Mes: Nombre y Número
+          let mesLargo = MesLargo[dateJSON.getMonth()];
+          let mesN = dateJSON.getMonth() + 1;
+
+          // Año: Largo y Corto
+          let año = dateJSON.getFullYear();
+
+          // Fecha a mostrar en Tabla Movimientos
+          let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
+
+          // Arreglo con objeto que tenga el mismo Item
+          let ArrFiltro = productoTable.filter(
+            fil => fil.item == ids.data().item
+          );
+          console.log(ids.data().item);
+
+          // Obtener Código de Item Seleccionado
+          let codigoItem = ArrFiltro[0].codigo;
+
+          // Obtener Unidad de Item Seleccionado
+          let unidadItem = ArrFiltro[0].unidad;
+
+          let factura = ids.data().factura;
+          let guia = ids.data().guia;
+          let observaciones = ids.data().observacion;
+
+          if (factura == "") {
+            factura = "-";
+          }
+          if (guia == "") {
+            guia = "-";
+          }
+          if (observaciones == "") {
+            observaciones = "-";
+          }
+
+          let entradas = {
+            id_inout: ids.id,
+            mes: mesLargo,
+            fecha: fechaReal,
+            codigo: codigoItem,
+            item: ids.data().item,
+            unidad: unidadItem,
+            entrada: ids.data().cantidad,
+            factura: factura,
+            guia: guia,
+            observacion: observaciones,
+            salida: "-",
+            entregado_a: "-",
+            hoja_registro: "-"
+          };
+          this.inout.push(entradas);
+        });
 
         queryOut.forEach(ids => {
-            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
-            let dateMiliSeconds = ids.data().fecha.seconds * 1000
-            
-            // Tomar como argumento dato anterior para Clase Date
-            let dateJSON = new Date(dateMiliSeconds);
-            
-            // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()]
-            let diaNum = dateJSON.getDate();
-            let diaConCeros = diaNum;
-            for (let i = 1; i < 10; i++) {
-              if (diaNum === i) { diaConCeros = `0${i}` }
+          // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
+          let dateMiliSeconds = ids.data().fecha.seconds * 1000;
+
+          // Tomar como argumento dato anterior para Clase Date
+          let dateJSON = new Date(dateMiliSeconds);
+
+          // Día: Nombre y Número
+          let diaNom = diaNombres[dateJSON.getDay()];
+          let diaNum = dateJSON.getDate();
+          let diaConCeros = diaNum;
+          for (let i = 1; i < 10; i++) {
+            if (diaNum === i) {
+              diaConCeros = `0${i}`;
             }
+          }
 
-            // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()]
-            let mesN = dateJSON.getMonth() + 1;
+          // Mes: Nombre y Número
+          let mesLargo = MesLargo[dateJSON.getMonth()];
+          let mesN = dateJSON.getMonth() + 1;
 
-            // Año: Largo y Corto
-            let año = dateJSON.getFullYear()
+          // Año: Largo y Corto
+          let año = dateJSON.getFullYear();
 
-            // Fecha a mostrar en Tabla Movimientos
-            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
+          // Fecha a mostrar en Tabla Movimientos
+          let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
 
+          // Arreglo con objeto que tenga el mismo Item
+          let filArray = productoTable.filter(
+            fil => fil.item == ids.data().item
+          );
 
-            // Arreglo con objeto que tenga el mismo Item
-            let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+          // Obtener Código de Item Seleccionado
+          let codigoItem = filArray[0].codigo;
 
-            // Obtener Código de Item Seleccionado
-            let codigoItem = filArray[0].codigo;
+          // Obtener Unidad de Item Seleccionado
+          let unidadItem = filArray[0].unidad;
 
-            // Obtener Unidad de Item Seleccionado
-            let unidadItem = filArray[0].unidad;
+          let factura = ids.data().factura;
+          let guia = ids.data().guia;
+          let entregado = ids.data().entregado_a;
+          let observaciones = ids.data().observacion;
+          let hoja_registro = ids.data().hoja_registro;
 
+          if (factura == "") {
+            factura = "-";
+          }
+          if (guia == "") {
+            guia = "-";
+          }
+          if (entregado == "") {
+            entregado = "Sin información";
+          }
+          if (observaciones == "") {
+            observaciones = "-";
+          }
+          if (hoja_registro == "") {
+            hoja_registro = "-";
+          }
 
-            let factura = ids.data().factura;
-            let guia = ids.data().guia;
-            let entregado = ids.data().entregado_a;
-            let observaciones = ids.data().observacion;
-            let hoja_registro = ids.data().hoja_registro;
-
-            if (factura == "") {
-              factura = "-"
-            }
-            if (guia == "") {
-              guia = "-"
-            }
-            if (entregado == "") {
-              entregado = "Sin información"
-            }
-            if (observaciones == "") {
-              observaciones = "-"
-            }
-            if (hoja_registro == "") {
-              hoja_registro = "-"
-            }
-
-            let salidas = {
-              id_inout: ids.id,
-              mes: mesLargo,
-              fecha: fechaReal,
-              unidad: unidadItem,
-              codigo: codigoItem,
-              item: ids.data().item,
-              salida: ids.data().cantidad,
-              factura: factura,
-              guia: guia,
-              observacion: observaciones,
-              entregado_a: entregado,
-              hoja_registro: hoja_registro,
-              entrada: "-"
-            }
-            this.inout.push(salidas)
-          },
-        );
+          let salidas = {
+            id_inout: ids.id,
+            mes: mesLargo,
+            fecha: fechaReal,
+            unidad: unidadItem,
+            codigo: codigoItem,
+            item: ids.data().item,
+            salida: ids.data().cantidad,
+            factura: factura,
+            guia: guia,
+            observacion: observaciones,
+            entregado_a: entregado,
+            hoja_registro: hoja_registro,
+            entrada: "-"
+          };
+          this.inout.push(salidas);
+        });
 
         // console.log(this.inout);
-        
       } catch (error) {
         console.log(error);
-      } finally{
+      } finally {
         this.$q.loading.hide();
       }
     },
-
-
-
-
 
     // Función para filtrar en Select
     filterFn(val, update, abort) {
@@ -1634,8 +1748,6 @@ export default {
         });
     },
 
-    
-
     // Limpiar datos (btn) en formulario de Creación de Producto.
     cleanFormAddItem() {
       this.item = "";
@@ -1650,21 +1762,21 @@ export default {
     // Limpiar datos (btn) en formulario de ENTRADA de Producto.
     cleanFormAddInput() {
       (this.item = ""),
-      (this.inputCantidad = ""),
-      (this.inputFactura = ""),
-      (this.inputGuia = ""),
-      (this.inputObs = "");
+        (this.inputCantidad = ""),
+        (this.inputFactura = ""),
+        (this.inputGuia = ""),
+        (this.inputObs = "");
     },
 
     // Limpiar datos (btn) en formulario de SALIDA de Producto.
     cleanFormAddOutput() {
       (this.item = ""),
-      (this.outputCantidad = ""),
-      (this.outputFactura = ""),
-      (this.outputGuia = ""),
-      (this.outputEntregado = "");
-      (this.outputHojaRegistro = "");
-      (this.outputObs = "");
+        (this.outputCantidad = ""),
+        (this.outputFactura = ""),
+        (this.outputGuia = ""),
+        (this.outputEntregado = "");
+      this.outputHojaRegistro = "";
+      this.outputObs = "";
     },
 
     // Carga Masiva
@@ -1748,26 +1860,37 @@ export default {
         })
         .onOk(async () => {
           try {
+            // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
+            this.itemLoad = this.item.toUpperCase().trim();
+
+            // Normalizo para Capitalizar dato.
+            this.lugarLoad =
+              this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
+            this.tipoLoad =
+              this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
+            this.unidadLoad =
+              this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
+
             let query = await db
               .collection("productos")
               .doc(this.id)
               .update({
                 // id: this.id,
-                item: this.item,
+                item: this.itemLoad,
                 codigo: this.codigo,
                 stock: this.stock,
-                lugar: this.lugar,
-                tipo: this.tipo,
-                unidad: this.unidad,
+                lugar: this.lugarLoad,
+                tipo: this.tipoLoad,
+                unidad: this.unidadLoad,
                 minimo: this.minimo
               });
             // this.data[this.idRowTable].id = this.id
             // this.data[this.idRowTable].item = this.item
             // this.data[this.idRowTable].codigo = this.codigo
             // this.data[this.idRowTable].stock = this.stock
-            this.data[this.idRowTable].lugar = this.lugar;
-            this.data[this.idRowTable].tipo = this.tipo;
-            this.data[this.idRowTable].unidad = this.unidad;
+            this.data[this.idRowTable].lugar = this.lugarLoad;
+            this.data[this.idRowTable].tipo = this.tipoLoad;
+            this.data[this.idRowTable].unidad = this.unidadLoad;
             this.data[this.idRowTable].minimo = this.minimo;
           } catch (error) {
             this.$q.notify({
@@ -1782,11 +1905,15 @@ export default {
 
             this.id = "";
             this.item = "";
+            this.itemLoad = "";
             this.codigo = "";
             this.stock = "";
             this.lugar = "";
+            this.lugarLoad = "";
             this.tipo = "";
+            this.tipoLoad = "";
             this.unidad = "";
+            this.unidadLoad = "";
             this.minimo = "";
 
             this.$q.notify({
@@ -1821,23 +1948,34 @@ export default {
         })
         .onOk(async () => {
           try {
+            // Normalizo input de Item para eliminar espacios y dejar en mayúscula.
+            this.itemLoad = this.item.toUpperCase().trim();
+
+            // Normalizo para Capitalizar dato.
+            this.lugarLoad =
+              this.lugar.charAt(0).toUpperCase() + this.lugar.slice(1);
+            this.tipoLoad =
+              this.tipo.charAt(0).toUpperCase() + this.tipo.slice(1);
+            this.unidadLoad =
+              this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
+
             let query = await db.collection("productos").add({
-              item: this.item,
+              item: this.itemLoad,
               codigo: this.codigo,
               stock: this.stock,
-              lugar: this.lugar,
-              tipo: this.tipo,
-              unidad: this.unidad,
+              lugar: this.lugarLoad,
+              tipo: this.tipoLoad,
+              unidad: this.unidadLoad,
               minimo: this.minimo
             });
             await this.data.push({
               id: query.id,
-              item: this.item,
+              item: this.itemLoad,
               codigo: this.codigo,
               stock: this.stock,
-              lugar: this.lugar,
-              tipo: this.tipo,
-              unidad: this.unidad,
+              lugar: this.lugarLoad,
+              tipo: this.tipoLoad,
+              unidad: this.unidadLoad,
               minimo: this.minimo
             });
           } catch (error) {
@@ -1849,13 +1987,16 @@ export default {
             });
           } finally {
             this.addItem = false;
-
             this.item = "";
+            this.itemLoad = "";
             this.codigo = "";
             this.stock = "";
             this.lugar = "";
+            this.lugarLoad = "";
             this.tipo = "";
+            this.tipoLoad = "";
             this.unidad = "";
+            this.unidadLoad = "";
             this.minimo = "";
 
             this.$q.notify({
@@ -1934,34 +2075,32 @@ export default {
 
             // Actualizar Suma en Tabla Inventario
 
-
-
             // Actualizar en LocalStorage Tabla Movimientos
             // let dateMiliSeconds = ids.data().fecha.seconds * 1000
-            
+
             // Tomar como argumento dato anterior para Clase Date
             // let dateJSON = new Date(dateMiliSeconds);
             let dateJSON = new Date();
-            
+
             // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()]
+            let diaNom = diaNombres[dateJSON.getDay()];
             let diaNum = dateJSON.getDate();
             let diaConCeros = diaNum;
             for (let i = 1; i < 10; i++) {
               if (diaNum === i) {
-                diaConCeros = `0${i}`
-              }}
+                diaConCeros = `0${i}`;
+              }
+            }
 
             // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()]
+            let mesLargo = MesLargo[dateJSON.getMonth()];
             let mesN = dateJSON.getMonth() + 1;
 
             // Año: Largo y Corto
-            let año = dateJSON.getFullYear()
+            let año = dateJSON.getFullYear();
 
             // Fecha a mostrar en Tabla Movimientos
             let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
-
 
             // Arreglo con objeto que tenga el mismo Item
             // let filArray = productoTable.filter(fil => fil.item == ids.data().item);
@@ -1972,19 +2111,18 @@ export default {
             // Obtener Unidad de Item Seleccionado
             let unidadItem = filArray[0].unidad;
 
-
             let factura = this.inputFactura;
             let guia = this.inputGuia;
             let observaciones = this.inputObs;
 
             if (factura == "") {
-              factura = "-"
+              factura = "-";
             }
             if (guia == "") {
-              guia = "-"
+              guia = "-";
             }
             if (observaciones == "") {
-              observaciones = "-"
+              observaciones = "-";
             }
             await this.inout.push({
               mes: mesLargo,
@@ -1998,9 +2136,8 @@ export default {
               observacion: observaciones,
               salida: "-",
               entregado_a: "-",
-              hoja_registro: "-",
+              hoja_registro: "-"
             });
-
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
