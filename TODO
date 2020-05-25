@@ -1,3 +1,14 @@
 
 Todo:
-  ☐ Item
+  ☐ Disminuir las peticiones que hacen a la DDBB.
+  ☐ Hacer una petición inicial al cargar la página y guardar la DDBB en el array data.
+  ☐ Cambiar las peticiones a la DDBB (Petición GET a: "Productos", "Entradas", "Salidas") al array data.
+
+Index.vue:
+  ☐ 1. Método:  
+  ☐ 1. Método:  
+  ☐ 1. Método:  
+  ☐ 1. Método:  
+  ☐ 1. Método:  
+  ☐ 1. Método:  
+  ☐ 1. Método:  

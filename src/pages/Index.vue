@@ -1111,6 +1111,258 @@ export default {
   },
 
   methods: {
+    // Traer datos de Firebase a tabla de existencias.
+    async listarInventario() {
+      try {
+        const spinner =
+          typeof QSpinnerFacebook !== "undefined"
+            ? QSpinnerFacebook // Non-UMD, imported above
+            : Quasar.components.QSpinnerFacebook; // eslint-disable-line
+        /* End of Codepen workaround */
+        
+
+        this.$q.loading.show({
+          spinner,
+          spinnerColor: "indigo",
+          spinnerSize: 140,
+          backgroundColor: "indigo",
+          message: "Por favor espere. Se están cargando sus datos...",
+          messageColor: "white"
+        });
+
+        const query = await db.collection("productos").get();
+
+        await query.forEach(elemento => {
+
+          let unidad = elemento.data().unidad;
+          let lugar = elemento.data().lugar;
+
+          if (unidad == "") {
+              unidad = "-"
+            }
+          if (lugar == "") {
+              lugar = "-"
+            }
+
+          let producto = {
+            id: elemento.id,
+            item: elemento.data().item,
+            stock: elemento.data().stock,
+            codigo: elemento.data().codigo,
+            unidad: unidad,
+            lugar: lugar,
+            tipo: elemento.data().tipo,
+            minimo: elemento.data().minimo
+          };
+          this.data.push(producto);
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$q.loading.hide();
+
+        await this.data.forEach(e => {
+          let das = e.item;
+          this.stringOptions.push(das);
+        });
+      }
+    },
+
+    // Traer datos a Tabla de Movimientos
+    async listarInOut() {
+      try {
+        const spinner =
+          typeof QSpinnerFacebook !== "undefined"
+            ? QSpinnerFacebook // Non-UMD, imported above
+            : Quasar.components.QSpinnerFacebook; // eslint-disable-line
+
+        this.$q.loading.show({
+          spinner,
+          spinnerColor: "indigo",
+          spinnerSize: 140,
+          backgroundColor: "indigo",
+          message: "Por favor espere. Se están cargando sus datos...",
+          messageColor: "white"
+        });
+
+        const queryIn = await db.collection("entradas").get();
+        const queryOut = await db.collection("salidas").get();
+        const getCodigo = await db.collection("productos").get();
+        console.log(queryIn)
+
+        let productoTable = [];
+
+        await getCodigo.forEach(elemento => {
+          let producto = {
+            item: elemento.data().item,
+            codigo: elemento.data().codigo,
+            unidad: elemento.data().unidad,
+          };
+          productoTable.push(producto);
+        });
+
+        queryIn.forEach(ids => {
+            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
+            let dateMiliSeconds = ids.data().fecha.seconds * 1000
+            
+            // Tomar como argumento dato anterior para Clase Date
+            let dateJSON = new Date(dateMiliSeconds);
+            
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()]
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`
+              }}
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()]
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear()
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
+
+
+            // Arreglo con objeto que tenga el mismo Item
+            let ArrFiltro = productoTable.filter(fil => fil.item == ids.data().item);
+            console.log(ids.data().item)
+
+            // Obtener Código de Item Seleccionado
+            let codigoItem = ArrFiltro[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let unidadItem = ArrFiltro[0].unidad;
+
+
+            let factura = ids.data().factura;
+            let guia = ids.data().guia;
+            let observaciones = ids.data().observacion;
+
+            if (factura == "") {
+              factura = "-"
+            }
+            if (guia == "") {
+              guia = "-"
+            }
+            if (observaciones == "") {
+              observaciones = "-"
+            }
+
+
+            let entradas = {
+              id_inout: ids.id,
+              mes: mesLargo,
+              fecha: fechaReal,
+              codigo: codigoItem,
+              item: ids.data().item,
+              unidad: unidadItem,
+              entrada: ids.data().cantidad,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              salida: "-",
+              entregado_a: "-",
+              hoja_registro: "-",
+            }
+            this.inout.push(entradas)
+          }
+        );
+
+        queryOut.forEach(ids => {
+            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
+            let dateMiliSeconds = ids.data().fecha.seconds * 1000
+            
+            // Tomar como argumento dato anterior para Clase Date
+            let dateJSON = new Date(dateMiliSeconds);
+            
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()]
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) { diaConCeros = `0${i}` }
+            }
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()]
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear()
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
+
+
+            // Arreglo con objeto que tenga el mismo Item
+            let filArray = productoTable.filter(fil => fil.item == ids.data().item);
+
+            // Obtener Código de Item Seleccionado
+            let codigoItem = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let unidadItem = filArray[0].unidad;
+
+
+            let factura = ids.data().factura;
+            let guia = ids.data().guia;
+            let entregado = ids.data().entregado_a;
+            let observaciones = ids.data().observacion;
+            let hoja_registro = ids.data().hoja_registro;
+
+            if (factura == "") {
+              factura = "-"
+            }
+            if (guia == "") {
+              guia = "-"
+            }
+            if (entregado == "") {
+              entregado = "Sin información"
+            }
+            if (observaciones == "") {
+              observaciones = "-"
+            }
+            if (hoja_registro == "") {
+              hoja_registro = "-"
+            }
+
+            let salidas = {
+              id_inout: ids.id,
+              mes: mesLargo,
+              fecha: fechaReal,
+              unidad: unidadItem,
+              codigo: codigoItem,
+              item: ids.data().item,
+              salida: ids.data().cantidad,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              entregado_a: entregado,
+              hoja_registro: hoja_registro,
+              entrada: "-"
+            }
+            this.inout.push(salidas)
+          },
+        );
+
+        // console.log(this.inout);
+        
+      } catch (error) {
+        console.log(error);
+      } finally{
+        this.$q.loading.hide();
+      }
+    },
+
+
+
+
+
     // Función para filtrar en Select
     filterFn(val, update, abort) {
       if (val.length < 2) {
@@ -1382,253 +1634,7 @@ export default {
         });
     },
 
-    // Traer datos de Firebase a tabla de existencias.
-    async listarInventario() {
-      try {
-        const spinner =
-          typeof QSpinnerFacebook !== "undefined"
-            ? QSpinnerFacebook // Non-UMD, imported above
-            : Quasar.components.QSpinnerFacebook; // eslint-disable-line
-        /* End of Codepen workaround */
-        
-
-        this.$q.loading.show({
-          spinner,
-          spinnerColor: "indigo",
-          spinnerSize: 140,
-          backgroundColor: "indigo",
-          message: "Por favor espere. Se están cargando sus datos...",
-          messageColor: "white"
-        });
-
-        const query = await db.collection("productos").get();
-
-        await query.forEach(elemento => {
-
-          let unidad = elemento.data().unidad;
-          let lugar = elemento.data().lugar;
-
-          if (unidad == "") {
-              unidad = "-"
-            }
-          if (lugar == "") {
-              lugar = "-"
-            }
-
-          let producto = {
-            id: elemento.id,
-            item: elemento.data().item,
-            stock: elemento.data().stock,
-            codigo: elemento.data().codigo,
-            unidad: unidad,
-            lugar: lugar,
-            tipo: elemento.data().tipo,
-            minimo: elemento.data().minimo
-          };
-          this.data.push(producto);
-        });
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.$q.loading.hide();
-
-        await this.data.forEach(e => {
-          let das = e.item;
-          this.stringOptions.push(das);
-        });
-      }
-    },
-
-    // Traer datos a Tabla de Movimientos
-    async listarInOut() {
-      try {
-        const spinner =
-          typeof QSpinnerFacebook !== "undefined"
-            ? QSpinnerFacebook // Non-UMD, imported above
-            : Quasar.components.QSpinnerFacebook; // eslint-disable-line
-
-        this.$q.loading.show({
-          spinner,
-          spinnerColor: "indigo",
-          spinnerSize: 140,
-          backgroundColor: "indigo",
-          message: "Por favor espere. Se están cargando sus datos...",
-          messageColor: "white"
-        });
-
-        const queryIn = await db.collection("entradas").get();
-        const queryOut = await db.collection("salidas").get();
-        const getCodigo = await db.collection("productos").get();
-        console.log(queryIn)
-
-        let productoTable = [];
-
-        await getCodigo.forEach(elemento => {
-          let producto = {
-            item: elemento.data().item,
-            codigo: elemento.data().codigo,
-            unidad: elemento.data().unidad,
-          };
-          productoTable.push(producto);
-        });
-
-        queryIn.forEach(ids => {
-            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
-            let dateMiliSeconds = ids.data().fecha.seconds * 1000
-            
-            // Tomar como argumento dato anterior para Clase Date
-            let dateJSON = new Date(dateMiliSeconds);
-            
-            // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()]
-            let diaNum = dateJSON.getDate();
-            let diaConCeros = diaNum;
-            for (let i = 1; i < 10; i++) {
-              if (diaNum === i) {
-                diaConCeros = `0${i}`
-              }}
-
-            // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()]
-            let mesN = dateJSON.getMonth() + 1;
-
-            // Año: Largo y Corto
-            let año = dateJSON.getFullYear()
-
-            // Fecha a mostrar en Tabla Movimientos
-            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
-
-
-            // Arreglo con objeto que tenga el mismo Item
-            let ArrFiltro = productoTable.filter(fil => fil.item == ids.data().item);
-            console.log(ids.data().item)
-
-            // Obtener Código de Item Seleccionado
-            let codigoItem = ArrFiltro[0].codigo;
-
-            // Obtener Unidad de Item Seleccionado
-            let unidadItem = ArrFiltro[0].unidad;
-
-
-            let factura = ids.data().factura;
-            let guia = ids.data().guia;
-            let observaciones = ids.data().observacion;
-
-            if (factura == "") {
-              factura = "-"
-            }
-            if (guia == "") {
-              guia = "-"
-            }
-            if (observaciones == "") {
-              observaciones = "-"
-            }
-
-
-            let entradas = {
-              id_inout: ids.id,
-              mes: mesLargo,
-              fecha: fechaReal,
-              codigo: codigoItem,
-              item: ids.data().item,
-              unidad: unidadItem,
-              entrada: ids.data().cantidad,
-              factura: factura,
-              guia: guia,
-              observacion: observaciones,
-              salida: "-",
-              entregado_a: "-",
-              hoja_registro: "-",
-            }
-            this.inout.push(entradas)
-          }
-        );
-
-        queryOut.forEach(ids => {
-            // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
-            let dateMiliSeconds = ids.data().fecha.seconds * 1000
-            
-            // Tomar como argumento dato anterior para Clase Date
-            let dateJSON = new Date(dateMiliSeconds);
-            
-            // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()]
-            let diaNum = dateJSON.getDate();
-            let diaConCeros = diaNum;
-            for (let i = 1; i < 10; i++) {
-              if (diaNum === i) { diaConCeros = `0${i}` }
-            }
-
-            // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()]
-            let mesN = dateJSON.getMonth() + 1;
-
-            // Año: Largo y Corto
-            let año = dateJSON.getFullYear()
-
-            // Fecha a mostrar en Tabla Movimientos
-            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`
-
-
-            // Arreglo con objeto que tenga el mismo Item
-            let filArray = productoTable.filter(fil => fil.item == ids.data().item);
-
-            // Obtener Código de Item Seleccionado
-            let codigoItem = filArray[0].codigo;
-
-            // Obtener Unidad de Item Seleccionado
-            let unidadItem = filArray[0].unidad;
-
-
-            let factura = ids.data().factura;
-            let guia = ids.data().guia;
-            let entregado = ids.data().entregado_a;
-            let observaciones = ids.data().observacion;
-            let hoja_registro = ids.data().hoja_registro;
-
-            if (factura == "") {
-              factura = "-"
-            }
-            if (guia == "") {
-              guia = "-"
-            }
-            if (entregado == "") {
-              entregado = "Sin información"
-            }
-            if (observaciones == "") {
-              observaciones = "-"
-            }
-            if (hoja_registro == "") {
-              hoja_registro = "-"
-            }
-
-            let salidas = {
-              id_inout: ids.id,
-              mes: mesLargo,
-              fecha: fechaReal,
-              unidad: unidadItem,
-              codigo: codigoItem,
-              item: ids.data().item,
-              salida: ids.data().cantidad,
-              factura: factura,
-              guia: guia,
-              observacion: observaciones,
-              entregado_a: entregado,
-              hoja_registro: hoja_registro,
-              entrada: "-"
-            }
-            this.inout.push(salidas)
-          },
-        );
-
-        // console.log(this.inout);
-        
-      } catch (error) {
-        console.log(error);
-      } finally{
-        this.$q.loading.hide();
-      }
-    },
+    
 
     // Limpiar datos (btn) en formulario de Creación de Producto.
     cleanFormAddItem() {
