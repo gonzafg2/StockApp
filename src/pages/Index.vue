@@ -1355,9 +1355,7 @@ export default {
           let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
 
           // Arreglo con objeto que tenga el mismo Item
-          let ArrFiltro = this.data.filter(
-            fil => fil.item == ids.data().item
-          );
+          let ArrFiltro = this.data.filter(fil => fil.item == ids.data().item);
 
           // Obtener Código de Item Seleccionado
           let codigoItem = ArrFiltro[0].codigo;
@@ -1425,9 +1423,7 @@ export default {
           let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
 
           // Arreglo con objeto que tenga el mismo Item
-          let filArray = this.data.filter(
-            fil => fil.item == ids.data().item
-          );
+          let filArray = this.data.filter(fil => fil.item == ids.data().item);
 
           // Obtener Código de Item Seleccionado
           let codigoItem = filArray[0].codigo;
@@ -1885,7 +1881,7 @@ export default {
 
             // Obtener ID de Item Seleccionado
             let idSelOutput = filArray[0].id;
-            
+
             // Obtener Código de Item Seleccionado
             let stockCodigo = filArray[0].codigo;
 
@@ -1905,9 +1901,9 @@ export default {
               .update({
                 stock: stockResta
               });
-            
+
             // Actualizar en Local campo de stock con dato ingresado en formulario.
-            
+
             // Tomar fecha actual con Clase Date.
             let dateJSON = new Date();
 
@@ -1930,7 +1926,7 @@ export default {
 
             // Fecha a mostrar en Tabla Movimientos
             let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
-            
+
             // Variables locales para ingreso a Tabla Movimientos en Local.
             let factura = this.outputFactura;
             let guia = this.outputGuia;
@@ -2205,12 +2201,14 @@ export default {
         .onOk(async () => {
           try {
             this.$q.loading.show();
+
             // Borrar en Firebase
             let idF = index.id;
             const query = await db
               .collection("productos")
               .doc(idF)
               .delete();
+              
             // Borrar en LocalStorage
             let indexLocal = this.data.indexOf(index);
             await this.data.splice(indexLocal, 1);
@@ -2238,20 +2236,20 @@ export default {
 
     // Limpiar datos (btn) en formulario de ENTRADA de Producto.
     cleanFormAddInput() {
-      (this.item = ""),
-        (this.inputCantidad = ""),
-        (this.inputFactura = ""),
-        (this.inputGuia = ""),
-        (this.inputObs = "");
+      this.item = "",
+      this.inputCantidad = "",
+      this.inputFactura = "",
+      this.inputGuia = "",
+      this.inputObs = "";
     },
 
     // Limpiar datos (btn) en formulario de SALIDA de Producto.
     cleanFormAddOutput() {
-      (this.item = ""),
-        (this.outputCantidad = ""),
-        (this.outputFactura = ""),
-        (this.outputGuia = ""),
-        (this.outputEntregado = "");
+      this.item = "",
+      this.outputCantidad = "",
+      this.outputFactura = "",
+      this.outputGuia = "",
+      this.outputEntregado = "";
       this.outputHojaRegistro = "";
       this.outputObs = "";
     },
@@ -2278,7 +2276,7 @@ export default {
         .onOk(async () => {
           try {
             // TODO: Corregir animación de espera para carga masiva
-            this.loading = true;
+            // this.loading = true;
             const importBigData = bigdata.forEach(async set => {
               const query = await db.collection("productos").add(set);
 
@@ -2302,7 +2300,7 @@ export default {
             });
           } finally {
             // this.$q.loading.hide();
-            this.loading = false;
+            // this.loading = false;
 
             this.$q.notify({
               message:
@@ -2314,7 +2312,7 @@ export default {
             });
           }
         });
-    },
+    }
   }
 };
 </script>
