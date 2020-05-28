@@ -1,22 +1,13 @@
-# ColorsApp
+# StockApp
 
-_ColorsApp es una aplicación desarrollada con Vue JS para ayudar a los usuarios en su trabajo diario copiando los códigos hexadecimales de los colores dentro de una paleta determinada._
+_StockApp es una aplicación desarrollada con Vue JS para ayudar a los usuarios en su trabajo diario copiando los códigos hexadecimales de los colores dentro de una paleta determinada._
 
 _Puedes ingresar desde estos links:_
 
-[https://miapp.digital/colors](https://miapp.digital/colors) 
-_ó_ 
-[https://color-app-vue.herokuapp.com/colors](https://color-app-vue.herokuapp.com/colors)
+[https://miapp.digital/stockapp](https://miapp.digital/stockapp)
 
-![](https://raw.githubusercontent.com/gonzafg2/ColorsApp/master/colorsapp.png)
-_Al hacer clic en un color se ve lo siguiente:_
-![](https://raw.githubusercontent.com/gonzafg2/ColorsApp/master/colorsapp2.png)
+![](https://github.com/gonzafg2/StockApp/blob/master/stockapp.png)
 
-_La paleta de colores es obtenida a través de una API de prueba._
-<!-- ``` -->
-[https://reqres.in/api/colors](https://reqres.in/api/colors)
-
-<!-- ``` -->
 ## Comenzando 🚀
 
 _Estas instrucciones te permitirán obtener una copia del proyecto en funcionamiento en tu máquina local para propósitos de desarrollo y pruebas._
