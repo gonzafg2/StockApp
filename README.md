@@ -6,7 +6,10 @@ _Puedes ingresar desde estos links:_
 
 [https://miapp.digital/stockapp](https://miapp.digital/stockapp)
 
-![Snapshot-1](https://github.com/gonzafg2/StockApp/blob/master/stockapp.png)
+![Snapshot-1](https://github.com/gonzafg2/StockApp/blob/master/snap1.png)
+![Snapshot-2](https://github.com/gonzafg2/StockApp/blob/master/snap2.png)
+![Snapshot-3](https://github.com/gonzafg2/StockApp/blob/master/snap3.png)
+![Snapshot-4](https://github.com/gonzafg2/StockApp/blob/master/snap4.png)
 
 ## Construido con 🛠️
 
