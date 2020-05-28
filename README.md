@@ -34,7 +34,7 @@ _El autor de este proyecto es:_
 
 ## Licencia 📄
 
-Este proyecto está bajo la Licencia Apache-2.0 - mira el archivo [LICENSE](https://github.com/gonzafg2/ColorsApp/blob/master/LICENSE) para detalles.
+Este proyecto está bajo la Licencia Apache-2.0 - mira el archivo [LICENSE](https://github.com/gonzafg2/StockApp/blob/master/LICENSE) para detalles.
 
 ## Expresiones de Gratitud 🎁
 
