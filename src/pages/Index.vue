@@ -324,7 +324,7 @@
             val="entregado_a"
             label="Entregado"
           />
-          <!-- Toggle de Columna de Observaciones -->
+          <!-- Toggle de Columna de observacion -->
           <q-toggle
             class="q-px-sm"
             v-model="visibleColumnsInOut"
@@ -1291,6 +1291,12 @@ export default {
         // Mostrar error en consola.
         console.log(error);
         // Mostrar error como notificación.
+        this.$q.notify({
+          message: `Ha ocurrido un problema. El error es: ${error}`,
+          color: "red",
+          textColor: "white",
+          icon: "clear"
+        });
       } finally {
         this.$q.loading.hide();
 
@@ -1320,19 +1326,6 @@ export default {
 
         const queryIn = await db.collection("entradas").get();
         const queryOut = await db.collection("salidas").get();
-        const getCodigo = await db.collection("productos").get();
-        // console.log(queryIn);
-
-        let productoTable = [];
-
-        await getCodigo.forEach(elemento => {
-          let producto = {
-            item: elemento.data().item,
-            codigo: elemento.data().codigo,
-            unidad: elemento.data().unidad
-          };
-          productoTable.push(producto);
-        });
 
         queryIn.forEach(ids => {
           // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
@@ -1362,10 +1355,9 @@ export default {
           let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
 
           // Arreglo con objeto que tenga el mismo Item
-          let ArrFiltro = productoTable.filter(
+          let ArrFiltro = this.data.filter(
             fil => fil.item == ids.data().item
           );
-          console.log(ids.data().item);
 
           // Obtener Código de Item Seleccionado
           let codigoItem = ArrFiltro[0].codigo;
@@ -1375,7 +1367,7 @@ export default {
 
           let factura = ids.data().factura;
           let guia = ids.data().guia;
-          let observaciones = ids.data().observacion;
+          let observacion = ids.data().observacion;
 
           if (factura == "") {
             factura = "-";
@@ -1383,8 +1375,8 @@ export default {
           if (guia == "") {
             guia = "-";
           }
-          if (observaciones == "") {
-            observaciones = "-";
+          if (observacion == "") {
+            observacion = "-";
           }
 
           let entradas = {
@@ -1397,7 +1389,7 @@ export default {
             entrada: ids.data().cantidad,
             factura: factura,
             guia: guia,
-            observacion: observaciones,
+            observacion: observacion,
             salida: "-",
             entregado_a: "-",
             hoja_registro: "-"
@@ -1433,7 +1425,7 @@ export default {
           let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
 
           // Arreglo con objeto que tenga el mismo Item
-          let filArray = productoTable.filter(
+          let filArray = this.data.filter(
             fil => fil.item == ids.data().item
           );
 
@@ -1446,7 +1438,7 @@ export default {
           let factura = ids.data().factura;
           let guia = ids.data().guia;
           let entregado = ids.data().entregado_a;
-          let observaciones = ids.data().observacion;
+          let observacion = ids.data().observacion;
           let hoja_registro = ids.data().hoja_registro;
 
           if (factura == "") {
@@ -1458,8 +1450,8 @@ export default {
           if (entregado == "") {
             entregado = "Sin información";
           }
-          if (observaciones == "") {
-            observaciones = "-";
+          if (observacion == "") {
+            observacion = "-";
           }
           if (hoja_registro == "") {
             hoja_registro = "-";
@@ -1475,7 +1467,7 @@ export default {
             salida: ids.data().cantidad,
             factura: factura,
             guia: guia,
-            observacion: observaciones,
+            observacion: observacion,
             entregado_a: entregado,
             hoja_registro: hoja_registro,
             entrada: "-"
@@ -1486,6 +1478,12 @@ export default {
         // console.log(this.inout);
       } catch (error) {
         console.log(error);
+        this.$q.notify({
+          message: `Ha ocurrido un problema. El error es: ${error}`,
+          color: "red",
+          textColor: "white",
+          icon: "clear"
+        });
       } finally {
         this.$q.loading.hide();
       }
@@ -1512,6 +1510,7 @@ export default {
           (this.tipoUpdate = index.tipo),
           (this.minimoUpdate = index.minimo);
       } catch (error) {
+        console.log(error);
         this.$q.notify({
           message: `Ha ocurrido un problema. El error es: ${error}`,
           color: "red",
@@ -1740,29 +1739,20 @@ export default {
               fecha: timestamp,
               guia: this.inputGuia,
               item: this.item,
-              observaciones: this.inputObs
-            });
-
-            let getStock = await db.collection("productos").get();
-
-            let productoTable = [];
-
-            await getStock.forEach(elemento => {
-              let producto = {
-                id: elemento.id,
-                item: elemento.data().item,
-                stock: elemento.data().stock,
-                codigo: elemento.data().codigo,
-                unidad: elemento.data().unidad
-              };
-              productoTable.push(producto);
+              observacion: this.inputObs
             });
 
             // Buscar Arreglo con objeto que tenga el mismo nombre de Item
-            let filArray = productoTable.filter(fil => fil.item == this.item);
+            let filArray = this.data.filter(fil => fil.item == this.item);
 
             // Obtener ID de Item Seleccionado
             let idSelInput = filArray[0].id;
+
+            // Obtener Código de Item Seleccionado
+            let stockCodigo = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let stockUnidad = filArray[0].unidad;
 
             // Obtener Stock de Item Seleccionado
             let stockItem = filArray[0].stock;
@@ -1779,11 +1769,9 @@ export default {
 
             // Actualizar Suma en Tabla Inventario
 
-            // Actualizar en LocalStorage Tabla Movimientos
-            // let dateMiliSeconds = ids.data().fecha.seconds * 1000
+            // Actualizar en Local Tabla Movimientos
 
             // Tomar como argumento dato anterior para Clase Date
-            // let dateJSON = new Date(dateMiliSeconds);
             let dateJSON = new Date();
 
             // Día: Nombre y Número
@@ -1806,18 +1794,9 @@ export default {
             // Fecha a mostrar en Tabla Movimientos
             let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
 
-            // Arreglo con objeto que tenga el mismo Item
-            // let filArray = productoTable.filter(fil => fil.item == ids.data().item);
-
-            // Obtener Código de Item Seleccionado
-            let codigoItem = filArray[0].codigo;
-
-            // Obtener Unidad de Item Seleccionado
-            let unidadItem = filArray[0].unidad;
-
             let factura = this.inputFactura;
             let guia = this.inputGuia;
-            let observaciones = this.inputObs;
+            let observacion = this.inputObs;
 
             if (factura == "") {
               factura = "-";
@@ -1825,19 +1804,19 @@ export default {
             if (guia == "") {
               guia = "-";
             }
-            if (observaciones == "") {
-              observaciones = "-";
+            if (observacion == "") {
+              observacion = "-";
             }
             await this.inout.push({
               mes: mesLargo,
               fecha: fechaReal,
-              codigo: codigoItem,
+              codigo: stockCodigo,
               item: this.item,
-              unidad: unidadItem,
+              unidad: stockUnidad,
               entrada: this.inputCantidad,
               factura: factura,
               guia: guia,
-              observacion: observaciones,
+              observacion: observacion,
               salida: "-",
               entregado_a: "-",
               hoja_registro: "-"
@@ -1860,6 +1839,160 @@ export default {
 
             this.$q.notify({
               message: "La entrada se ha guardado exitosamente",
+              color: "positive",
+              textColor: "white",
+              type: "positive",
+              position: "top"
+            });
+          }
+        });
+    },
+
+    // Guardar datos (btn) en formulario de SALIDA de Producto.
+    saveAddOutput() {
+      this.$q
+        .dialog({
+          title: "Acción Importante: Requiere Confirmación.",
+          message: "¿Está seguro de guardar esta salida de producto",
+          ok: {
+            push: true,
+            color: "positive",
+            label: "Sí, guardar."
+          },
+          cancel: {
+            push: true,
+            color: "negative",
+            label: "¡No!"
+          },
+          persistent: true
+        })
+        .onOk(async () => {
+          try {
+            // Agrego datos a bd de Firebase.
+            let query = await db.collection("salidas").add({
+              cantidad: this.outputCantidad,
+              factura: this.outputFactura,
+              fecha: timestamp,
+              guia: this.outputGuia,
+              entregado_a: this.outputEntregado,
+              hoja_registro: this.outputHojaRegistro,
+              item: this.item,
+              observacion: this.outputObs
+            });
+
+            // Buscar en data objeto que tenga el mismo nombre de Item seleccionado.
+            let filArray = this.data.filter(fil => fil.item == this.item);
+
+            // Obtener ID de Item Seleccionado
+            let idSelOutput = filArray[0].id;
+            
+            // Obtener Código de Item Seleccionado
+            let stockCodigo = filArray[0].codigo;
+
+            // Obtener Unidad de Item Seleccionado
+            let stockUnidad = filArray[0].unidad;
+
+            // Obtener Stock de Item Seleccionado
+            let stockItem = filArray[0].stock;
+
+            // Realiza la resta de la cantidad saliente con la cantidad en stock. (Dato en local)
+            let stockResta = stockItem - this.outputCantidad;
+
+            // Actualizar en Firebase campo de stock con dato ingresado en formulario.
+            let update = db
+              .collection("productos")
+              .doc(idSelOutput)
+              .update({
+                stock: stockResta
+              });
+            
+            // Actualizar en Local campo de stock con dato ingresado en formulario.
+            
+            // Tomar fecha actual con Clase Date.
+            let dateJSON = new Date();
+
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()];
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`;
+              }
+            }
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()];
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear();
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
+            
+            // Variables locales para ingreso a Tabla Movimientos en Local.
+            let factura = this.outputFactura;
+            let guia = this.outputGuia;
+            let entregado = this.outputEntregado;
+            let observacion = this.outputObs;
+            let hoja_registro = this.outputHojaRegistro;
+
+            // Normalizo campos vacíos a mostrar.
+            if (factura == "") {
+              factura = "-";
+            }
+            if (guia == "") {
+              guia = "-";
+            }
+            if (entregado == "") {
+              entregado = "-";
+            }
+            if (observacion == "") {
+              observacion = "-";
+            }
+            if (hoja_registro == "") {
+              hoja_registro = "-";
+            }
+
+            let salidas = {
+              mes: mesLargo,
+              fecha: fechaReal,
+              unidad: stockUnidad,
+              codigo: stockCodigo,
+              item: this.item,
+              salida: this.outputCantidad,
+              factura: factura,
+              guia: guia,
+              observacion: observacion,
+              entregado_a: entregado,
+              hoja_registro: hoja_registro,
+              entrada: "-"
+            };
+            // Actualizar en Local campo de stock con dato ingresado en formulario.
+            this.inout.push(salidas);
+          } catch (error) {
+            this.$q.notify({
+              message: `Ha ocurrido un problema. El error es: ${error}`,
+              color: "red",
+              textColor: "white",
+              icon: "clear"
+            });
+          } finally {
+            // Cierra modal de Agregar Entrada de Producto.
+            this.addOutput = false;
+
+            // Limpia variables de formulario de su posterior uso.
+            this.item = "";
+            this.outputCantidad = "";
+            this.outputFactura = "";
+            this.outputGuia = "";
+            this.outputEntregado = "";
+            this.outputHojaRegistro = "";
+            this.outputObs = "";
+
+            this.$q.notify({
+              message: "La salida se ha guardado exitosamente",
               color: "positive",
               textColor: "white",
               type: "positive",
@@ -2182,160 +2315,6 @@ export default {
           }
         });
     },
-
-    // Guardar datos (btn) en formulario de SALIDA de Producto.
-    saveAddOutput() {
-      this.$q
-        .dialog({
-          title: "Acción Importante: Requiere Confirmación.",
-          message: "¿Está seguro de guardar esta salida de producto",
-          ok: {
-            push: true,
-            color: "positive",
-            label: "Sí, guardar."
-          },
-          cancel: {
-            push: true,
-            color: "negative",
-            label: "¡No!"
-          },
-          persistent: true
-        })
-        .onOk(async () => {
-          try {
-            // Agrego datos a bd de Firebase.
-            let query = await db.collection("salidas").add({
-              cantidad: this.outputCantidad,
-              factura: this.outputFactura,
-              fecha: timestamp,
-              guia: this.outputGuia,
-              entregado_a: this.outputEntregado,
-              hoja_registro: this.outputHojaRegistro,
-              item: this.item,
-              observacion: this.outputObs
-            });
-
-            // Buscar en data objeto que tenga el mismo nombre de Item seleccionado.
-            let filArray = this.data.filter(fil => fil.item == this.item);
-
-            // Obtener ID de Item Seleccionado
-            let idSelOutput = filArray[0].id;
-            
-            // Obtener ID de Item Seleccionado
-            let stockCodigo = filArray[0].codigo;
-
-            // Obtener Stock de Item Seleccionado
-            let stockItem = filArray[0].stock;
-            
-            // Obtener Stock de Item Seleccionado
-            let stockUnidad = filArray[0].unidad;
-
-            // Realiza la resta de la cantidad saliente con la cantidad en stock. (Dato en local)
-            let stockResta = stockItem - this.outputCantidad;
-
-            // Actualizar en Firebase campo de stock con dato ingresado en formulario.
-            let update = db
-              .collection("productos")
-              .doc(idSelOutput)
-              .update({
-                stock: stockResta
-              });
-            
-            // Actualizar en Local campo de stock con dato ingresado en formulario.
-            
-            // Tomar fecha actual con Clase Date.
-            let dateJSON = new Date();
-
-            // Día: Nombre y Número
-            let diaNom = diaNombres[dateJSON.getDay()];
-            let diaNum = dateJSON.getDate();
-            let diaConCeros = diaNum;
-            for (let i = 1; i < 10; i++) {
-              if (diaNum === i) {
-                diaConCeros = `0${i}`;
-              }
-            }
-
-            // Mes: Nombre y Número
-            let mesLargo = MesLargo[dateJSON.getMonth()];
-            let mesN = dateJSON.getMonth() + 1;
-
-            // Año: Largo y Corto
-            let año = dateJSON.getFullYear();
-
-            // Fecha a mostrar en Tabla Movimientos
-            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
-            
-            // Variables locales para ingreso a Tabla Movimientos en Local.
-            let factura = this.outputFactura;
-            let guia = this.outputGuia;
-            let entregado = this.outputEntregado;
-            let observaciones = this.outputObs;
-            let hoja_registro = this.outputHojaRegistro;
-
-            // Normalizo campos vacíos a mostrar.
-            if (factura == "") {
-              factura = "-";
-            }
-            if (guia == "") {
-              guia = "-";
-            }
-            if (entregado == "") {
-              entregado = "-";
-            }
-            if (observaciones == "") {
-              observaciones = "-";
-            }
-            if (hoja_registro == "") {
-              hoja_registro = "-";
-            }
-
-            let salidas = {
-              mes: mesLargo,
-              fecha: fechaReal,
-              unidad: stockUnidad,
-              codigo: stockCodigo,
-              item: this.item,
-              salida: this.outputCantidad,
-              factura: factura,
-              guia: guia,
-              observacion: observaciones,
-              entregado_a: entregado,
-              hoja_registro: hoja_registro,
-              entrada: "-"
-            };
-            // Actualizar en Local campo de stock con dato ingresado en formulario.
-            this.inout.push(salidas);
-          } catch (error) {
-            this.$q.notify({
-              message: `Ha ocurrido un problema. El error es: ${error}`,
-              color: "red",
-              textColor: "white",
-              icon: "clear"
-            });
-          } finally {
-            // Cierra modal de Agregar Entrada de Producto.
-            this.addOutput = false;
-
-            // Limpia variables de formulario de su posterior uso.
-            this.item = "";
-            this.outputCantidad = "";
-            this.outputFactura = "";
-            this.outputGuia = "";
-            this.outputEntregado = "";
-            this.outputHojaRegistro = "";
-            this.outputObs = "";
-
-            this.$q.notify({
-              message: "La salida se ha guardado exitosamente",
-              color: "positive",
-              textColor: "white",
-              type: "positive",
-              position: "top"
-            });
-          }
-        });
-    }
   }
 };
 </script>

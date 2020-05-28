@@ -13,9 +13,9 @@ Index.vue:
   ✔ 4. Método: saveFormAddItem() @done(20-05-25 02:11)
   ✔ 5. Modal: Formulario de Ingreso de Producto @done(20-05-25 02:25)
   ✔ 6. Modal: Formulario de Actualización de Producto @done(20-05-25 02:25)
-  ☐ 7. Método: saveAddInput()
-  ☐ 8. Método: saveAddOutput()
-  ☐ 9. Método:  
+  ✔ 7. Método: saveAddInput() @done(20-05-27 22:16)
+  ✔ 8. Método: saveAddOutput() @done(20-05-27 22:02)
+  ✔ 9. Método: listarInOut() @done(20-05-27 22:28)
   ☐ 10. Método:  
   ☐ 11. Método:  
 
