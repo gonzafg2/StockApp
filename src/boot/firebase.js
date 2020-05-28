@@ -21,11 +21,11 @@ const perf = firebase.performance();
 
 var db = firebaseApp.firestore();
 
-if (location.hostname === "localhost") {
-  db.settings({
-    host: "localhost:8080",
-    ssl: false
-  });
-}
+// if (location.hostname === "localhost") {
+//   db.settings({
+//     host: "localhost:8080",
+//     ssl: false
+//   });
+// }
 
 export { db, firebase };

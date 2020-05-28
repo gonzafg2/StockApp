@@ -1,8 +1,8 @@
 
 Todo:
-  ☐ Disminuir las peticiones que hacen a la DDBB.
-  ☐ Hacer una petición inicial al cargar la página y guardar la DDBB en el array data.
-  ☐ Cambiar las peticiones a la DDBB (Petición GET a: "Productos", "Entradas", "Salidas") al array data.
+  ✔ Disminuir las peticiones que hacen a la DDBB. @done(20-05-27 22:42)
+  ✔ Hacer una petición inicial al cargar la página y guardar la DDBB en el array data. @done(20-05-27 22:42)
+  ✔ Cambiar las peticiones a la DDBB (Petición GET a: "Productos", "Entradas", "Salidas") al array data. @done(20-05-27 22:42)
   ✔ Si presiono editar item, los datos se mantienen para el formulario de creación de item. @done(20-05-25 01:51)
   ☐ Obtener los id y objetos de cada fila en las tablas.
 
