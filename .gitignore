@@ -36,3 +36,5 @@ ui-debug.log*
 *.ntvs*
 *.njsproj
 *.sln
+
+/src/csvjson-copy.js
