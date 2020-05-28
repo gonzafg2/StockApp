@@ -1905,7 +1905,7 @@ export default {
 
       const status = exportFile(
         // 'table-export.csv',
-        `${dateActual}_Movimientos.xlsx`,
+        `${dateActual}_Movimientos.csv`,
         content,
         "text/csv"
       );
@@ -2203,6 +2203,7 @@ export default {
         })
         .onOk(async () => {
           try {
+            // Agrego datos a bd de Firebase.
             let query = await db.collection("salidas").add({
               cantidad: this.outputCantidad,
               factura: this.outputFactura,
@@ -2214,37 +2215,97 @@ export default {
               observacion: this.outputObs
             });
 
-            let getStock = await db.collection("productos").get();
-
-            let productoTable = [];
-
-            await getStock.forEach(elemento => {
-              let producto = {
-                id: elemento.id,
-                item: elemento.data().item,
-                stock: elemento.data().stock
-              };
-              productoTable.push(producto);
-            });
-
-            // Buscar Arreglo con objeto que tenga el mismo nombre de Item
-            let filArray = productoTable.filter(fil => fil.item == this.item);
+            // Buscar en data objeto que tenga el mismo nombre de Item seleccionado.
+            let filArray = this.data.filter(fil => fil.item == this.item);
 
             // Obtener ID de Item Seleccionado
             let idSelOutput = filArray[0].id;
+            
+            // Obtener ID de Item Seleccionado
+            let stockCodigo = filArray[0].codigo;
 
             // Obtener Stock de Item Seleccionado
             let stockItem = filArray[0].stock;
+            
+            // Obtener Stock de Item Seleccionado
+            let stockUnidad = filArray[0].unidad;
 
-            let stockSuma = stockItem - this.outputCantidad;
+            // Realiza la resta de la cantidad saliente con la cantidad en stock. (Dato en local)
+            let stockResta = stockItem - this.outputCantidad;
 
-            // Actualizar campo de stock con dato ingresado en formulario
+            // Actualizar en Firebase campo de stock con dato ingresado en formulario.
             let update = db
               .collection("productos")
               .doc(idSelOutput)
               .update({
-                stock: stockSuma
+                stock: stockResta
               });
+            
+            // Actualizar en Local campo de stock con dato ingresado en formulario.
+            
+            // Tomar fecha actual con Clase Date.
+            let dateJSON = new Date();
+
+            // Día: Nombre y Número
+            let diaNom = diaNombres[dateJSON.getDay()];
+            let diaNum = dateJSON.getDate();
+            let diaConCeros = diaNum;
+            for (let i = 1; i < 10; i++) {
+              if (diaNum === i) {
+                diaConCeros = `0${i}`;
+              }
+            }
+
+            // Mes: Nombre y Número
+            let mesLargo = MesLargo[dateJSON.getMonth()];
+            let mesN = dateJSON.getMonth() + 1;
+
+            // Año: Largo y Corto
+            let año = dateJSON.getFullYear();
+
+            // Fecha a mostrar en Tabla Movimientos
+            let fechaReal = `${diaNom}, ${diaConCeros} de ${mesLargo} del  ${año}`;
+            
+            // Variables locales para ingreso a Tabla Movimientos en Local.
+            let factura = this.outputFactura;
+            let guia = this.outputGuia;
+            let entregado = this.outputEntregado;
+            let observaciones = this.outputObs;
+            let hoja_registro = this.outputHojaRegistro;
+
+            // Normalizo campos vacíos a mostrar.
+            if (factura == "") {
+              factura = "-";
+            }
+            if (guia == "") {
+              guia = "-";
+            }
+            if (entregado == "") {
+              entregado = "-";
+            }
+            if (observaciones == "") {
+              observaciones = "-";
+            }
+            if (hoja_registro == "") {
+              hoja_registro = "-";
+            }
+
+            let salidas = {
+              mes: mesLargo,
+              fecha: fechaReal,
+              unidad: stockUnidad,
+              codigo: stockCodigo,
+              item: this.item,
+              salida: this.outputCantidad,
+              factura: factura,
+              guia: guia,
+              observacion: observaciones,
+              entregado_a: entregado,
+              hoja_registro: hoja_registro,
+              entrada: "-"
+            };
+            // Actualizar en Local campo de stock con dato ingresado en formulario.
+            this.inout.push(salidas);
           } catch (error) {
             this.$q.notify({
               message: `Ha ocurrido un problema. El error es: ${error}`,
@@ -2253,8 +2314,10 @@ export default {
               icon: "clear"
             });
           } finally {
+            // Cierra modal de Agregar Entrada de Producto.
             this.addOutput = false;
 
+            // Limpia variables de formulario de su posterior uso.
             this.item = "";
             this.outputCantidad = "";
             this.outputFactura = "";

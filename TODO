@@ -14,7 +14,12 @@ Index.vue:
   ✔ 5. Modal: Formulario de Ingreso de Producto @done(20-05-25 02:25)
   ✔ 6. Modal: Formulario de Actualización de Producto @done(20-05-25 02:25)
   ☐ 7. Método: saveAddInput()
-  ☐ 8. Método:  
+  ☐ 8. Método: saveAddOutput()
   ☐ 9. Método:  
   ☐ 10. Método:  
   ☐ 11. Método:  
+
+Mejorando Notificaciones:
+  ☐ 1. Evitar solapamiento de notificación:
+      ☐ a. Agregar en objeto notify, como hermano de message y color, esto: group: false.
+  ☐ 2. Evitar desvanecimiento de notificación y poner botón de cerrado.
