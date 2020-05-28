@@ -1,8 +1,8 @@
 # StockApp
 
-_StockApp es una aplicación desarrollada con Vue JS para ayudar a las empresas a gestionar su inventario de productos, ya sea, de uso interno como también para sus ventas._
+_StockApp es una aplicación desarrollada con VueJS (Quasar Framwork) y Firebase para ayudar a las empresas a gestionar su inventario de productos, ya sea, de uso interno como también para sus ventas._
 
-_Puedes ingresar desde estos links:_
+_Puedes ingresar desde éste enlace:_
 
 [https://miapp.digital/stockapp](https://miapp.digital/stockapp)
 
