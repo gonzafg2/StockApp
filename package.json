@@ -15,7 +15,7 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "animate.css": "^4.1.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "connect-history-api-fallback": "^1.6.0",
     "csv-parse": "^4.10.1",
     "express": "^4.17.1",
