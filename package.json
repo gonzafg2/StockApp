@@ -1,0 +1,60 @@
+{
+  "name": "storeapp",
+  "version": "1.0.1",
+  "description": "Una app para gestionar inventario",
+  "productName": "Store App",
+  "cordovaId": "org.cordova.quasar.app",
+  "capacitorId": "",
+  "author": "Gonzalo Fleming <gonzafg2@gmail.com>",
+  "private": true,
+  "scripts": {
+    "build": "quasar build",
+    "dev": "quasar dev",
+    "start": "node server.js",
+    "heroku-postbuild": "npm run build"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.0.0",
+    "animate.css": "^4.1.0",
+    "axios": "^0.18.1",
+    "connect-history-api-fallback": "^1.6.0",
+    "csv-parse": "^4.10.1",
+    "express": "^4.17.1",
+    "firebase": "^7.14.4",
+    "quasar": "^1.0.0",
+    "serve-static": "^1.14.1"
+  },
+  "devDependencies": {
+    "@quasar/app": "^1.8.8",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-vue": "^6.1.2"
+  },
+  "engines": {
+    "node": ">= 10.18.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  },
+  "browserslist": [
+    "last 1 version, not dead, ie >= 11"
+  ],
+  "resolutions": {
+    "@babel/parser": "7.7.5"
+  },
+  "main": ".eslintrc.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gonzafg2/StockApp.git"
+  },
+  "keywords": [
+    "Vue",
+    "Js"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gonzafg2/StockApp/issues"
+  },
+  "homepage": "https://github.com/gonzafg2/StockApp#readme"
+}
