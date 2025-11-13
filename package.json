@@ -13,23 +13,24 @@
     "heroku-postbuild": "npm run build"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
-    "animate.css": "^4.1.0",
-    "axios": "^0.18.1",
+    "@quasar/extras": "^1.17.0",
+    "animate.css": "^4.1.1",
+    "axios": "^1.7.7",
     "connect-history-api-fallback": "^1.6.0",
-    "csv-parse": "^4.10.1",
-    "express": "^4.17.1",
-    "firebase": "^7.14.4",
-    "quasar": "^1.0.0",
-    "serve-static": "^1.14.1"
+    "csv-parse": "^4.16.3",
+    "express": "^4.21.1",
+    "firebase": "^8.10.1",
+    "quasar": "^1.22.10",
+    "serve-static": "^1.16.2"
   },
   "devDependencies": {
-    "@quasar/app": "^1.8.8",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-loader": "^3.0.3",
-    "eslint-plugin-vue": "^6.1.2"
+    "@quasar/app": "^1.9.6",
+    "@babel/core": "^7.25.2",
+    "@babel/eslint-parser": "^7.25.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-webpack-plugin": "^3.2.0",
+    "eslint-plugin-vue": "^7.20.0"
   },
   "engines": {
     "node": ">= 10.18.1",

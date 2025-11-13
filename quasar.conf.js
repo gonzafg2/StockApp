@@ -76,15 +76,13 @@ module.exports = function (/* ctx */) {
 
         // https://quasar.dev/quasar-cli/cli-documentation/handling-webpack
         extendWebpack(cfg) {
-          cfg.module.rules.push({
-            enforce: "pre",
-            test: /\.(js|vue)$/,
-            loader: "eslint-loader",
-            exclude: /node_modules/,
-            options: {
-              formatter: require("eslint").CLIEngine.getFormatter("stylish")
-            }
-          });
+          const ESLintPlugin = require("eslint-webpack-plugin");
+          cfg.plugins.push(
+            new ESLintPlugin({
+              extensions: ["js", "vue"],
+              exclude: "node_modules"
+            })
+          );
         }
       },
 
