@@ -1,0 +1,44 @@
+name: CI - Build and Lint
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  lint-and-build:
+    name: Lint and Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npx eslint --ext .js,.vue src
+        continue-on-error: true
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts
+        if: matrix.node-version == '16.x'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist/spa
+          retention-days: 7
