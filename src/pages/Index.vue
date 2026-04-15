@@ -69,14 +69,14 @@
 
     <!-- Tabla de Inventario de Productos -->
     <q-table
-      :data="data"
+      :rows="data"
       :columns="columns"
       :loading="loading"
       :filter="filter"
-      :pagination.sync="pagination"
+      v-model:pagination="pagination"
       :pagination-label="getPaginationLabel"
       :visible-columns="visibleColumns"
-      :selected.sync="selected"
+      v-model:selected="selected"
       :selected-rows-label="getSelectedString"
       color="primary"
       class="fit"
@@ -278,11 +278,11 @@
 
     <!-- Tabla de Movimientos de Productos -->
     <q-table
-      :data="inout"
+      :rows="inout"
       :columns="columnsInOut"
       :loading="loading"
       :filter="filterInOut"
-      :pagination.sync="pagination"
+      v-model:pagination="pagination"
       :pagination-label="getPaginationLabel"
       :visible-columns="visibleColumnsInOut"
       color="primary"

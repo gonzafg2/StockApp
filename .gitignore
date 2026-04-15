@@ -30,6 +30,9 @@ database-debug.log*
 pubsub-debug.log*
 ui-debug.log*
 
+# Firebase cache
+.firebase/
+
 # Editor directories and files
 .idea
 *.suo
