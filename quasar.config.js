@@ -1,6 +1,6 @@
-const { configure } = require('quasar/wrappers')
+import { defineConfig } from '#q-app/wrappers'
 
-module.exports = configure(function (/* ctx */) {
+export default defineConfig(function (/* ctx */) {
   return {
     boot: ['axios', 'firebase'],
 
@@ -39,7 +39,7 @@ module.exports = configure(function (/* ctx */) {
     },
 
     pwa: {
-      workboxMode: 'generateSW',
+      workboxMode: 'GenerateSW',
       manifest: {
         name: 'Stock App',
         short_name: 'Stock App',
