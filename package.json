@@ -24,14 +24,14 @@
     "connect-history-api-fallback": "^1.6.0",
     "csv-parse": "^4.16.3",
     "express": "^4.21.1",
-    "firebase": "^8.10.1",
+    "firebase": "^10.9.0",
     "quasar": "^2.16.0",
     "serve-static": "^1.16.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/eslint-parser": "^7.25.1",
-    "@quasar/app-webpack": "^3.13.0",
+    "@quasar/app-webpack": "^4.4.5",
     "ajv": "^8.18.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.10.0",
