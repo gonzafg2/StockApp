@@ -1,12 +1,19 @@
 name: Deploy to Firebase Hosting on PR
-on: pull_request
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number for channel ID'
+        required: true
+        default: '8'
 permissions:
   checks: write
   contents: read
   pull-requests: write
 jobs:
   build_and_preview:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -28,4 +35,4 @@ jobs:
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
