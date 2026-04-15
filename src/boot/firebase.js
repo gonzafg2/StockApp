@@ -1,7 +1,6 @@
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/performance";
-
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getPerformance } from "firebase/performance";
 
 // Agregar configuración firebase:
 var firebaseConfig = {
@@ -15,19 +14,13 @@ var firebaseConfig = {
   measurementId: "G-4YH5FK7TGC"
 };
 
-let firebaseApp = firebase.initializeApp(firebaseConfig);
-// let db = firebase.firestore();
-const perf = firebase.performance();
-
-// const analytics = firebase.analytics();
-
-var db = firebaseApp.firestore();
+const firebaseApp = initializeApp(firebaseConfig);
+const perf = getPerformance(firebaseApp);
 
 // if (location.hostname === "localhost") {
-//   db.settings({
-//     host: "localhost:8080",
-//     ssl: false
-//   });
+//   connectFirestoreEmulator(db, "localhost", 8080);
 // }
 
-export { db, firebase };
+const db = getFirestore(firebaseApp);
+
+export { db };
