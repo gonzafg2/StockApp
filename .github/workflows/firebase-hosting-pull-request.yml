@@ -8,6 +8,8 @@ jobs:
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_YES: 'true'
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -15,7 +17,6 @@ jobs:
           node-version: lts/krypton
           cache: 'npm'
       - run: npm ci
-      - run: npm install -g firebase-tools@15.14.0
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
