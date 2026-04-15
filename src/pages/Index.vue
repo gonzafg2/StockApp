@@ -912,7 +912,16 @@
 </template>
 
 <script>
-import { db, firebase } from "../boot/firebase";
+import { db } from "../boot/firebase";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
+} from "firebase/firestore";
 import { QSpinnerFacebook } from "quasar";
 import { exportFile } from "quasar";
 import { bigdata } from "../csvjson";
@@ -959,7 +968,7 @@ let dateActual = `${Year}-${monthShort}-${Day}`;
 
 let stringOptions = [];
 
-const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+const timestamp = serverTimestamp();
 
 const diaNombres = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
 const diaCeros = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09"];
@@ -1246,7 +1255,7 @@ export default {
         });
 
         // Almaceno BD en constante query.
-        const query = await db.collection("productos").get();
+        const query = await getDocs(collection(db, "productos"));
 
         // query es un objeto de más objetos, por lo que hay que transformarlo a un arreglo de objetos.
         await query.forEach(elemento => {
@@ -1324,8 +1333,8 @@ export default {
           messageColor: "white"
         });
 
-        const queryIn = await db.collection("entradas").get();
-        const queryOut = await db.collection("salidas").get();
+        const queryIn = await getDocs(collection(db, "entradas"));
+        const queryOut = await getDocs(collection(db, "salidas"));
 
         queryIn.forEach(ids => {
           // Recibir de Firestore Fecha en Segundos y Convertir a Milisegundos
@@ -1553,15 +1562,12 @@ export default {
             this.unidadUpdateLoad = unidadUpdateLoadPre.replace(/\s+/g, " ");
 
             // Actualizo "lugar", "tipo", "unidad" y "minimo" en Firestore.
-            let query = await db
-              .collection("productos")
-              .doc(this.idUpdate)
-              .update({
-                lugar: this.lugarUpdateLoad,
-                tipo: this.tipoUpdateLoad,
-                unidad: this.unidadUpdateLoad,
-                minimo: this.minimoUpdate
-              });
+            await updateDoc(doc(db, "productos", this.idUpdate), {
+              lugar: this.lugarUpdateLoad,
+              tipo: this.tipoUpdateLoad,
+              unidad: this.unidadUpdateLoad,
+              minimo: this.minimoUpdate
+            });
             // Actualizar en Tabla Inventario en LocalStorage.
             this.data[this.idRowTable].lugar = this.lugarUpdateLoad;
             this.data[this.idRowTable].tipo = this.tipoUpdateLoad;
@@ -1646,7 +1652,7 @@ export default {
               this.unidad.charAt(0).toUpperCase() + this.unidad.slice(1);
             this.unidadLoad = unidadLoadPre.replace(/\s+/g, " ");
 
-            let query = await db.collection("productos").add({
+            let query = await addDoc(collection(db, "productos"), {
               item: this.itemLoad,
               codigo: this.codigo,
               stock: this.stock,
@@ -1729,7 +1735,7 @@ export default {
         .onOk(async () => {
           try {
             // Añade los datos del formulario Entrada de Producto a Firebase.
-            let query = await db.collection("entradas").add({
+            let query = await addDoc(collection(db, "entradas"), {
               cantidad: this.inputCantidad,
               factura: this.inputFactura,
               fecha: timestamp,
@@ -1756,12 +1762,9 @@ export default {
             let stockSuma = stockItem + this.inputCantidad;
 
             // Actualizar campo de stock con dato ingresado en formulario
-            let update = db
-              .collection("productos")
-              .doc(idSelInput)
-              .update({
-                stock: stockSuma
-              });
+            updateDoc(doc(db, "productos", idSelInput), {
+              stock: stockSuma
+            });
 
             // Actualizar Suma en Tabla Inventario
 
@@ -1865,7 +1868,7 @@ export default {
         .onOk(async () => {
           try {
             // Agrego datos a bd de Firebase.
-            let query = await db.collection("salidas").add({
+            let query = await addDoc(collection(db, "salidas"), {
               cantidad: this.outputCantidad,
               factura: this.outputFactura,
               fecha: timestamp,
@@ -1895,12 +1898,9 @@ export default {
             let stockResta = stockItem - this.outputCantidad;
 
             // Actualizar en Firebase campo de stock con dato ingresado en formulario.
-            let update = db
-              .collection("productos")
-              .doc(idSelOutput)
-              .update({
-                stock: stockResta
-              });
+            updateDoc(doc(db, "productos", idSelOutput), {
+              stock: stockResta
+            });
 
             // Actualizar en Local campo de stock con dato ingresado en formulario.
 
@@ -2143,10 +2143,7 @@ export default {
             let idArray = this.selected
               .map(el => el.id)
               .forEach(async id => {
-                const query = await db
-                  .collection("productos")
-                  .doc(id)
-                  .delete();
+                await deleteDoc(doc(db, "productos", id));
               });
 
             // Borrar en LocalStorage
@@ -2204,10 +2201,7 @@ export default {
 
             // Borrar en Firebase
             let idF = index.id;
-            const query = await db
-              .collection("productos")
-              .doc(idF)
-              .delete();
+            await deleteDoc(doc(db, "productos", idF));
               
             // Borrar en LocalStorage
             let indexLocal = this.data.indexOf(index);
@@ -2278,7 +2272,7 @@ export default {
             // TODO: Corregir animación de espera para carga masiva
             // this.loading = true;
             const importBigData = bigdata.forEach(async set => {
-              const query = await db.collection("productos").add(set);
+              const query = await addDoc(collection(db, "productos"), set);
 
               await this.data.push({
                 id: set.id,
