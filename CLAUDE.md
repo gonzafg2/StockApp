@@ -6,11 +6,11 @@ Contexto de desarrollo para Claude Code. Leer antes de cualquier tarea.
 
 ## 🏗️ Arquitectura
 
-- **Frontend:** SPA Quasar v1 + Vue 2, build en `/dist/spa`
+- **Frontend:** SPA Quasar v2 + Vue 3 (Webpack 5), build en `/dist/spa`
 - **Backend:** Firebase (Firestore + Auth) — serverless, sin API custom
 - **Hosting:** Firebase Hosting, proyecto `stock-kipreos`
 - **Dominio:** `miapp.digital/stockapp` (pendiente configurar en Firebase Console)
-- **Node requerido:** >= 10.18.1 (package.json), workflows en Node 18
+- **Node requerido:** >= 18 (package.json), workflows en Node 20
 
 ---
 
@@ -24,33 +24,41 @@ Actualización de dependencias deprecadas y vulnerabilidades de seguridad.
 - `firebase` 7.14.4 → 8.10.1
 - `babel-eslint` → `@babel/eslint-parser` (deprecado)
 - `eslint-loader` → `eslint-webpack-plugin` (deprecado)
-- `quasar` 1.0.0 → 1.22.10, `@quasar/app` 1.8.8 → 1.9.6
-- Agregado `firebase-tools ^13.0.0` a devDependencies
-- `.eslintrc.js` y `quasar.conf.js` adaptados a los nuevos paquetes
 
 **Estado:** ✅ Pusheada — pendiente PR y merge a main
 
 ---
 
-### `claude/setup-firebase-hosting-pipeline-011CV2Vd1maKLmG8mGBctVBY`
-Pipeline CI/CD con Firebase Hosting via GitHub Actions.
+### `claude/setup-firebase-hosting-pipeline-011CV2Vd1maKLmG8mGBctVBY` ← rama actual
+Pipeline CI/CD + migración Quasar v2.
 
-**Cambios:**
+**Cambios pipeline:**
 - `firebase.json` configurado con hosting, rewrites para SPA y headers de caché
 - `.github/workflows/firebase-hosting-merge.yml` — deploy a producción en push a main/master
 - `.github/workflows/firebase-hosting-pull-request.yml` — preview deployment en PRs
 - Scripts npm: `deploy:prod`, `deploy:preview`, `lint`, `lint:fix`
-- Secret `FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS` ya configurado en GitHub (via `firebase init hosting:github`)
+- Secret `FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS` ya configurado en GitHub
 
-**Estado:** ✅ Pusheada — pendiente PR y merge a main
+**Cambios migración Quasar v1 → v2 (incluidos en este PR):**
+- `quasar.conf.js` → `quasar.config.js` (API `configure()`, key `eslint:`)
+- Vue Router v3 → v4 (`createRouter`, `history:`, `scrollBehavior` left/top)
+- Vuex 3 → 4 (`createStore`, `process.env.DEBUGGING`)
+- Boot axios: `Vue.prototype` → `app.config.globalProperties`
+- `q-table`: `:data` → `:rows`, `.sync` → `v-model:` (Index.vue)
+- `src/statics/` → `public/` (activos estáticos Quasar v2)
+- ESLint: `plugin:vue/essential` → `plugin:vue/vue3-essential`
+- `ajv@^8.18.0` como devDependency directa (resuelve conflicto ajv-keywords)
+- Node 18 → 20 en workflows de GitHub Actions
+
+**Estado:** ✅ Commiteada localmente — pendiente push, PR y merge a main
 
 ---
 
 ## ⏳ Pendientes
 
-- [ ] Decidir versión de Node en workflows: **Node 18** (limpio) o **Node 24 LTS** (requiere `NODE_OPTIONS=--openssl-legacy-provider` por Webpack 4)
+- [ ] Push de rama actual y crear PR (pipeline + migración Quasar v2)
 - [ ] PR y merge de rama de dependencias a main
-- [ ] PR y merge de rama de pipeline a main
+- [ ] Verificar runtime: `npm run dev` + Firebase en browser
 - [ ] Configurar dominio custom `miapp.digital` en Firebase Console (Hosting → Add custom domain)
 - [ ] Primer deploy real a Firebase Hosting tras merge
 
@@ -58,24 +66,20 @@ Pipeline CI/CD con Firebase Hosting via GitHub Actions.
 
 ## ⚠️ Consideraciones Importantes
 
-### Node + Webpack 4
-`@quasar/app` v1.x usa Webpack 4. Desde Node 17+ hay conflicto con OpenSSL:
-```
-Error: error:0308010C:digital envelope routines::unsupported
-```
-Workaround si se sube a Node 18+:
-```yaml
-env:
-  NODE_OPTIONS: --openssl-legacy-provider
-```
-
-### Quasar v1 → v2 (futuro)
-No se migró a Quasar v2 (Vue 3) intencionalmente — es un proyecto separado más grande.
-Requeriría: Vue 2 → Vue 3, Vuex → Pinia, Webpack 4 → 5, refactor de componentes.
+### Quasar v2 + Webpack 5
+Migrado desde Quasar v1 (Vue 2, Webpack 4). El conflicto Node ≥17 + OpenSSL
+(`error:0308010C:digital envelope routines::unsupported`) está resuelto de raíz.
+**No se necesita** `NODE_OPTIONS=--openssl-legacy-provider`.
 
 ### Firebase v8
-Se actualizó a Firebase 8 (no 9+) para mantener compatibilidad con la API existente sin refactorizar los archivos boot (`src/boot/firebase.js`, `src/boot/axios.js`).
-Firebase 9+ usa API modular y requeriría cambios en el código.
+Se mantiene Firebase 8 (no 9+) para conservar la API compat existente.
+Firebase 9+ usa API modular y requeriría refactorizar `src/boot/firebase.js`.
+Las advertencias de Webpack 5 sobre `export 'initializeApp' was not found in 'firebase/app'`
+son cosméticas (análisis estático de namespace imports de v8) — no afectan el runtime.
+
+### vue/multi-word-component-names
+Deshabilitado en `.eslintrc.js` — los nombres de componentes existentes (`Index`, `Error404`, etc.)
+son pre-migración y renombrarlos está fuera de scope.
 
 ---
 
@@ -98,9 +102,9 @@ npm run deploy:preview # Build + deploy a preview channel
 |---------|-------------|
 | `firebase.json` | Hosting config + emuladores locales |
 | `.firebaserc` | Proyecto Firebase: `stock-kipreos` |
-| `quasar.conf.js` | Config de Quasar + Webpack |
-| `.eslintrc.js` | ESLint con `@babel/eslint-parser` |
+| `quasar.config.js` | Config de Quasar v2 + Webpack 5 |
+| `.eslintrc.js` | ESLint con `@babel/eslint-parser` + vue3-essential |
 | `server.js` | Express sirve `/dist/spa` (legacy Heroku) |
+| `public/icons/` | Favicons (en v1 estaban en `src/statics/icons/`) |
 | `.github/workflows/firebase-hosting-merge.yml` | Deploy a producción |
 | `.github/workflows/firebase-hosting-pull-request.yml` | Preview en PRs |
-| `DEPLOYMENT_GUIDE.md` | Guía completa de despliegue |
