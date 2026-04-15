@@ -19,5 +19,6 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
+          firebaseToolsVersion: 15.14.0
           channelId: live
           projectId: stock-kipreos
