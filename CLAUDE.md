@@ -9,7 +9,7 @@ Contexto de desarrollo para Claude Code. Leer antes de cualquier tarea.
 - **Frontend:** SPA Quasar v2 + Vue 3 (Webpack 5), build en `/dist/spa`
 - **Backend:** Firebase (Firestore + Auth) — serverless, sin API custom
 - **Hosting:** Firebase Hosting, proyecto `stock-kipreos`
-- **Dominio:** `miapp.digital/stockapp` (pendiente configurar en Firebase Console)
+- **Dominio:** Firebase Hosting URL por defecto (`stock-kipreos.web.app`)
 - **Node requerido:** >= 18 (package.json), workflows en Node 20
 
 ---
@@ -56,11 +56,7 @@ Pipeline CI/CD + migración Quasar v2.
 
 ## ⏳ Pendientes
 
-- [ ] Push de rama actual y crear PR (pipeline + migración Quasar v2)
-- [ ] PR y merge de rama de dependencias a main
-- [ ] Verificar runtime: `npm run dev` + Firebase en browser
-- [ ] Configurar dominio custom `miapp.digital` en Firebase Console (Hosting → Add custom domain)
-- [ ] Primer deploy real a Firebase Hosting tras merge
+- [ ] `FirebaseExtended/action-hosting-deploy@v0` aún usa node20 internamente — pendiente actualización por Firebase (deadline GitHub: junio 2026)
 
 ---
 
