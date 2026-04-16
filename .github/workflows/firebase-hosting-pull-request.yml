@@ -26,9 +26,14 @@ jobs:
       - name: Deploy Firebase Preview Channel
         run: |
           echo "$FIREBASE_SA" > /tmp/firebase-sa.json
+          echo "SA file size: $(wc -c < /tmp/firebase-sa.json)"
+          echo "Firebase bin: $(ls -la ./node_modules/.bin/firebase)"
+          echo "Node version: $(node --version)"
+          echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
           CHANNEL_ID="pr-${PR_NUMBER}"
+          echo "Channel ID: $CHANNEL_ID"
           ./node_modules/.bin/firebase hosting:channel:deploy "$CHANNEL_ID" \
-            --expires 7d --project stock-kipreos
+            --expires 7d --project stock-kipreos --debug 2>&1 || exit $?
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
