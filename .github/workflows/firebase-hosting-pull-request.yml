@@ -27,11 +27,8 @@ jobs:
         run: |
           echo "$FIREBASE_SA" > /tmp/firebase-sa.json
           CHANNEL_ID="pr-${PR_NUMBER}"
-          DEPLOY_URL=$(./node_modules/.bin/firebase hosting:channel:deploy "$CHANNEL_ID" \
-            --expires 7d --project stock-kipreos --json \
-            | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log(Object.values(d.result)[0].url)")
-          echo "Preview URL: $DEPLOY_URL"
-          echo "Deploy complete"
+          ./node_modules/.bin/firebase hosting:channel:deploy "$CHANNEL_ID" \
+            --expires 7d --project stock-kipreos
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
