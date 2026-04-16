@@ -19,32 +19,14 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/krypton
+          node-version: lts/jod
           cache: 'npm'
       - run: npm ci
       - run: npm run build
-      - name: Deploy Firebase Preview Channel
-        run: |
-          echo "=== Firebase CLI test ==="
-          ./node_modules/.bin/firebase --version 2>&1 || echo "firebase --version failed with $?"
-          echo "=== Writing SA credentials ==="
-          echo "$FIREBASE_SA" > /tmp/firebase-sa.json
-          wc -c /tmp/firebase-sa.json
-          echo "=== Firebase projects list (auth test) ==="
-          ./node_modules/.bin/firebase projects:list --debug 2>&1 | head -20 || echo "projects:list exit: $?"
-          echo "=== Deploying ==="
-          CHANNEL_ID="pr-${PR_NUMBER}"
-          set +e
-          node --trace-warnings \
-            ./node_modules/firebase-tools/lib/bin/firebase.js hosting:channel:deploy "$CHANNEL_ID" \
-            --expires 7d --project stock-kipreos --debug > /tmp/deploy-out.txt 2>&1
-          DEPLOY_RC=$?
-          echo "=== Deploy output (exit $DEPLOY_RC) ==="
-          cat /tmp/deploy-out.txt
-          echo "=== End deploy output ==="
-          set -e
-          [ $DEPLOY_RC -eq 0 ]
-        env:
-          FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
+          firebaseToolsVersion: 15.14.0
+          projectId: stock-kipreos
+          channelId: pr-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
