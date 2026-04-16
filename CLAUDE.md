@@ -29,17 +29,18 @@ Actualización de dependencias deprecadas y vulnerabilidades de seguridad.
 
 ---
 
-### `claude/setup-firebase-hosting-pipeline-011CV2Vd1maKLmG8mGBctVBY` ← rama actual
+### `fix/quasar-app-webpack-v4` ← rama actual (PR #8)
 Pipeline CI/CD + migración Quasar v2.
 
 **Cambios pipeline:**
 - `firebase.json` configurado con hosting, rewrites para SPA y headers de caché
 - `.github/workflows/firebase-hosting-merge.yml` — deploy a producción en push a main/master
-- `.github/workflows/firebase-hosting-pull-request.yml` — preview deployment en PRs
+- `.github/workflows/firebase-hosting-pull-request.yml` — preview deployment en PRs con `NPM_CONFIG_YES=true`
 - Scripts npm: `deploy:prod`, `deploy:preview`, `lint`, `lint:fix`
 - Secret `FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS` ya configurado en GitHub
+- `yaml@^2.8.3` como devDependency directa (workaround: `@apphosting/build@0.1.7` no lo declara en sus deps pero lo requiere; npm lo instalaba como dep anidada de firebase-tools y `@apphosting/build` no lo encontraba)
 
-**Cambios migración Quasar v1 → v2 (incluidos en este PR):**
+**Cambios migración Quasar v1 → v2:**
 - `quasar.conf.js` → `quasar.config.js` (API `configure()`, key `eslint:`)
 - Vue Router v3 → v4 (`createRouter`, `history:`, `scrollBehavior` left/top)
 - Vuex 3 → 4 (`createStore`, `process.env.DEBUGGING`)
@@ -50,13 +51,16 @@ Pipeline CI/CD + migración Quasar v2.
 - `ajv@^8.18.0` como devDependency directa (resuelve conflicto ajv-keywords)
 - Node 18 → 20 en workflows de GitHub Actions
 
-**Estado:** ✅ Commiteada localmente — pendiente push, PR y merge a main
+**Estado:** ✅ CI verde (preview: https://stock-kipreos--pr-8-6s8aawgm.web.app) — pendiente merge a master
 
 ---
 
 ## ⏳ Pendientes
 
+- [ ] Merge PR #8 (`fix/quasar-app-webpack-v4`) a master
 - [ ] `FirebaseExtended/action-hosting-deploy@v0` aún usa node20 internamente — pendiente actualización por Firebase (deadline GitHub: junio 2026)
+- [ ] Verificar runtime: `npm run dev` + Firebase en browser
+- [ ] Configurar dominio custom `miapp.digital` en Firebase Console (Hosting → Add custom domain)
 
 ---
 
