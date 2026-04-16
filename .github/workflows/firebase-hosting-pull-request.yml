@@ -32,10 +32,10 @@ jobs:
           wc -c /tmp/firebase-sa.json
           echo "=== Firebase projects list (auth test) ==="
           ./node_modules/.bin/firebase projects:list --debug 2>&1 | head -20 || echo "projects:list exit: $?"
-          echo "=== Deploying ==="
+          echo "=== Deploying with debug ==="
           CHANNEL_ID="pr-${PR_NUMBER}"
           ./node_modules/.bin/firebase hosting:channel:deploy "$CHANNEL_ID" \
-            --expires 7d --project stock-kipreos 2>&1
+            --expires 7d --project stock-kipreos --debug 2>&1 ; echo "EXIT: $?"
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
