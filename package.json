@@ -40,7 +40,8 @@
     "firebase-tools": "^15.14.0",
     "vue": "^3.4.0",
     "vue-router": "^4.0.0",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "yaml": "^2.8.3"
   },
   "engines": {
     "node": ">= 22",
