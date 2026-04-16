@@ -50,5 +50,11 @@
   },
   "browserslist": [
     "last 1 version, not dead, > 0.2%"
-  ]
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": ["core-js", "protobufjs", "re2"],
+    "overrides": {
+      "core-js": "^3.49.0"
+    }
+  }
 }
