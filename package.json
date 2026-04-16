@@ -31,15 +31,17 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/eslint-parser": "^7.25.1",
-    "@quasar/app-webpack": "^3.13.0",
+    "@quasar/app-webpack": "^4.4.5",
     "ajv": "^8.18.0",
+    "autoprefixer": "^10.5.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-vue": "^9.0.0",
     "firebase-tools": "^15.14.0",
     "vue": "^3.4.0",
     "vue-router": "^4.0.0",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "yaml": "^2.8.3"
   },
   "engines": {
     "node": ">= 22",
