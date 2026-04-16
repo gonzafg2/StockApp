@@ -25,15 +25,17 @@ jobs:
       - run: npm run build
       - name: Deploy Firebase Preview Channel
         run: |
+          echo "=== Firebase CLI test ==="
+          ./node_modules/.bin/firebase --version 2>&1 || echo "firebase --version failed with $?"
+          echo "=== Writing SA credentials ==="
           echo "$FIREBASE_SA" > /tmp/firebase-sa.json
-          echo "SA file size: $(wc -c < /tmp/firebase-sa.json)"
-          echo "Firebase bin: $(ls -la ./node_modules/.bin/firebase)"
-          echo "Node version: $(node --version)"
-          echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+          wc -c /tmp/firebase-sa.json
+          echo "=== Firebase projects list (auth test) ==="
+          ./node_modules/.bin/firebase projects:list --debug 2>&1 | head -20 || echo "projects:list exit: $?"
+          echo "=== Deploying ==="
           CHANNEL_ID="pr-${PR_NUMBER}"
-          echo "Channel ID: $CHANNEL_ID"
           ./node_modules/.bin/firebase hosting:channel:deploy "$CHANNEL_ID" \
-            --expires 7d --project stock-kipreos --debug 2>&1 || exit $?
+            --expires 7d --project stock-kipreos 2>&1
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
