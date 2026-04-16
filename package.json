@@ -7,15 +7,16 @@
   "capacitorId": "",
   "author": "Gonzalo Fleming <gonzafg2@gmail.com>",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "scripts": {
     "dev": "quasar dev",
     "build": "quasar build",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "start": "node server.js",
-    "heroku-postbuild": "npm run build",
-    "deploy:preview": "npm run build && firebase hosting:channel:deploy preview",
-    "deploy:prod": "npm run build && firebase deploy --only hosting"
+    "heroku-postbuild": "pnpm run build",
+    "deploy:preview": "pnpm run build && firebase hosting:channel:deploy preview",
+    "deploy:prod": "pnpm run build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@quasar/extras": "^1.17.0",
@@ -45,9 +46,15 @@
   },
   "engines": {
     "node": ">= 22",
-    "npm": ">= 6.13.4"
+    "pnpm": ">= 10"
   },
   "browserslist": [
     "last 1 version, not dead, > 0.2%"
-  ]
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": ["core-js", "esbuild", "protobufjs", "re2"],
+    "overrides": {
+      "core-js": "^3.49.0"
+    }
+  }
 }
