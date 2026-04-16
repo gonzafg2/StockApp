@@ -1357,6 +1357,9 @@ export default {
           // Arreglo con objeto que tenga el mismo Item
           let ArrFiltro = this.data.filter(fil => fil.item == ids.data().item);
 
+          // Si el item fue eliminado del inventario, omitir este movimiento
+          if (!ArrFiltro.length) return;
+
           // Obtener Código de Item Seleccionado
           let codigoItem = ArrFiltro[0].codigo;
 
@@ -1424,6 +1427,9 @@ export default {
 
           // Arreglo con objeto que tenga el mismo Item
           let filArray = this.data.filter(fil => fil.item == ids.data().item);
+
+          // Si el item fue eliminado del inventario, omitir este movimiento
+          if (!filArray.length) return;
 
           // Obtener Código de Item Seleccionado
           let codigoItem = filArray[0].codigo;
