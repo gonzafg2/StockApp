@@ -10,7 +10,8 @@ Contexto de desarrollo para Claude Code. Leer antes de cualquier tarea.
 - **Backend:** Firebase (Firestore + Auth) — serverless, sin API custom
 - **Hosting:** Firebase Hosting, proyecto `stock-kipreos`
 - **Dominio:** Firebase Hosting URL por defecto (`stock-kipreos.web.app`)
-- **Node requerido:** >= 18 (package.json), workflows en Node 20
+- **Package manager:** pnpm 10.30.3 (`pnpm-lock.yaml`)
+- **Node requerido:** >= 22 (package.json), workflows en Node LTS Krypton (22)
 
 ---
 
@@ -29,42 +30,42 @@ Actualización de dependencias deprecadas y vulnerabilidades de seguridad.
 
 ---
 
-### `fix/quasar-app-webpack-v4` ← rama actual (PR #8)
-Pipeline CI/CD + migración Quasar v2.
+### `feat/migrate-to-pnpm` ← rama actual
+Migración de npm a pnpm como gestor de paquetes.
 
-**Cambios pipeline:**
-- `firebase.json` configurado con hosting, rewrites para SPA y headers de caché
-- `.github/workflows/firebase-hosting-merge.yml` — deploy a producción en push a main/master
-- `.github/workflows/firebase-hosting-pull-request.yml` — preview deployment en PRs con `NPM_CONFIG_YES=true`
-- Scripts npm: `deploy:prod`, `deploy:preview`, `lint`, `lint:fix`
-- Secret `FIREBASE_SERVICE_ACCOUNT_STOCK_KIPREOS` ya configurado en GitHub
-- `yaml@^2.8.3` como devDependency directa (workaround: `@apphosting/build@0.1.7` no lo declara en sus deps pero lo requiere; npm lo instalaba como dep anidada de firebase-tools y `@apphosting/build` no lo encontraba)
+**Cambios:**
+- `package-lock.json` eliminado → `pnpm-lock.yaml` generado vía `pnpm import`
+- `packageManager: "pnpm@10.30.3"` agregado a `package.json`
+- Scripts actualizados: `npm run` → `pnpm run` en heroku-postbuild, deploy:preview, deploy:prod
+- `engines.npm` → `engines.pnpm: ">= 10"` en `package.json`
+- Workflows actualizados: `pnpm/action-setup@v4` + `cache: 'pnpm'` + `pnpm install --frozen-lockfile`
 
-**Cambios migración Quasar v1 → v2:**
-- `quasar.conf.js` → `quasar.config.js` (API `configure()`, key `eslint:`)
-- Vue Router v3 → v4 (`createRouter`, `history:`, `scrollBehavior` left/top)
-- Vuex 3 → 4 (`createStore`, `process.env.DEBUGGING`)
-- Boot axios: `Vue.prototype` → `app.config.globalProperties`
-- `q-table`: `:data` → `:rows`, `.sync` → `v-model:` (Index.vue)
-- `src/statics/` → `public/` (activos estáticos Quasar v2)
-- ESLint: `plugin:vue/essential` → `plugin:vue/vue3-essential`
-- `ajv@^8.18.0` como devDependency directa (resuelve conflicto ajv-keywords)
-- Node 18 → 20 en workflows de GitHub Actions
-
-**Estado:** ✅ CI verde (preview: https://stock-kipreos--pr-8-6s8aawgm.web.app) — pendiente merge a master
+**Estado:** 🔄 En progreso — pendiente CI verde, push, PR y merge
 
 ---
 
 ## ⏳ Pendientes
 
-- [ ] Merge PR #8 (`fix/quasar-app-webpack-v4`) a master
 - [ ] `FirebaseExtended/action-hosting-deploy@v0` aún usa node20 internamente — pendiente actualización por Firebase (deadline GitHub: junio 2026)
-- [ ] Verificar runtime: `npm run dev` + Firebase en browser
-- [ ] Configurar dominio custom `miapp.digital` en Firebase Console (Hosting → Add custom domain)
+- [ ] Verificar runtime: `pnpm run dev` en browser
 
 ---
 
 ## ⚠️ Consideraciones Importantes
+
+### pnpm y hoisting estricto
+pnpm usa symlinks hacia un store central en vez de copiar paquetes. Esto hace que las
+dependencias transitivas faltantes (como `yaml` en `@apphosting/build`) fallen más temprano
+y sean más visibles que con npm. `yaml@^2.8.3` está como devDependency directa por este motivo.
+
+Configuración necesaria en `package.json` para compatibilidad con Quasar + Firebase:
+- `shamefully-hoist=true` en `.npmrc`: hoisteara loaders de webpack (babel-loader, etc.) que
+  `@quasar/app-webpack` requiere pero no declara como peerDeps — sin esto el build falla.
+- `pnpm.overrides.core-js: "^3.49.0"`: firebase@8 arrastra `@firebase/polyfill` que pide
+  core-js@3.6.5; Quasar necesita 3.49.0 (módulos `es.uint8-array.*`). El override fuerza una
+  sola versión que satisface ambos (3.49.0 >= 3.6.5 en el rango ^3.x.x).
+- `pnpm.onlyBuiltDependencies`: core-js, protobufjs y re2 necesitan correr sus scripts de
+  instalación (pnpm v10 los bloquea por defecto).
 
 ### Quasar v2 + Webpack 5
 Migrado desde Quasar v1 (Vue 2, Webpack 4). El conflicto Node ≥17 + OpenSSL
@@ -77,6 +78,11 @@ Firebase 9+ usa API modular y requeriría refactorizar `src/boot/firebase.js`.
 Las advertencias de Webpack 5 sobre `export 'initializeApp' was not found in 'firebase/app'`
 son cosméticas (análisis estático de namespace imports de v8) — no afectan el runtime.
 
+### NPM_CONFIG_YES en workflows
+Se mantiene `NPM_CONFIG_YES: 'true'` aunque se use pnpm. El action `FirebaseExtended/action-hosting-deploy@v0`
+invoca `npx firebase-tools` internamente (con npm/npx del runner), por lo que esta variable
+sigue siendo necesaria para evitar prompts interactivos de npx.
+
 ### vue/multi-word-component-names
 Deshabilitado en `.eslintrc.js` — los nombres de componentes existentes (`Index`, `Error404`, etc.)
 son pre-migración y renombrarlos está fuera de scope.
@@ -86,12 +92,12 @@ son pre-migración y renombrarlos está fuera de scope.
 ## 🔧 Comandos Útiles
 
 ```bash
-npm run dev           # Desarrollo local
-npm run build         # Build de producción
-npm run lint          # Lint
-npm run lint:fix      # Lint con auto-fix
-npm run deploy:prod   # Build + deploy a Firebase Hosting (producción)
-npm run deploy:preview # Build + deploy a preview channel
+pnpm run dev           # Desarrollo local
+pnpm run build         # Build de producción
+pnpm run lint          # Lint
+pnpm run lint:fix      # Lint con auto-fix
+pnpm run deploy:prod   # Build + deploy a Firebase Hosting (producción)
+pnpm run deploy:preview # Build + deploy a preview channel
 ```
 
 ---
@@ -106,5 +112,6 @@ npm run deploy:preview # Build + deploy a preview channel
 | `.eslintrc.js` | ESLint con `@babel/eslint-parser` + vue3-essential |
 | `server.js` | Express sirve `/dist/spa` (legacy Heroku) |
 | `public/icons/` | Favicons (en v1 estaban en `src/statics/icons/`) |
+| `pnpm-lock.yaml` | Lockfile de pnpm (reemplaza package-lock.json) |
 | `.github/workflows/firebase-hosting-merge.yml` | Deploy a producción |
 | `.github/workflows/firebase-hosting-pull-request.yml` | Preview en PRs |
