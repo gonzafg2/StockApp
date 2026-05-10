@@ -21,11 +21,11 @@
   "dependencies": {
     "@quasar/extras": "^1.17.0",
     "animate.css": "^4.1.1",
-    "axios": "^1.7.7",
+    "axios": "^1.15.2",
     "connect-history-api-fallback": "^1.6.0",
     "csv-parse": "^4.16.3",
     "express": "^4.21.1",
-    "firebase": "^8.10.1",
+    "firebase": "^10.9.0",
     "quasar": "^2.16.0",
     "serve-static": "^1.16.2"
   },
